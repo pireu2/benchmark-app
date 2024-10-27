@@ -1,5 +1,6 @@
 package app.benchmarkapp
 
+import app.benchmarkapp.Util
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
@@ -143,57 +144,44 @@ class DeviceInfoProvider(private val context: Context) {
         glSurfaceView.setRenderer(renderer)
         glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
-        // Add GLSurfaceView to a FrameLayout and attach it to the window manager
         val frameLayout = FrameLayout(context)
         frameLayout.addView(glSurfaceView)
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val layoutParams = WindowManager.LayoutParams()
         windowManager.addView(frameLayout, layoutParams)
 
-        // Trigger rendering to initialize the OpenGL context
         glSurfaceView.requestRender()
 
-        // Remove the GLSurfaceView from the window manager
         windowManager.removeView(frameLayout)
 
         return GpuInfo(
             renderer.vendor,
             renderer.model,
-            0.0, // Placeholder for actual GPU frequency retrieval logic
-            0, // Placeholder for actual GPU memory size retrieval logic
+            0.0,
+            0,
             renderer.version
         )
     }
 
     private fun getCpuInfo() : CpuInfo{
         val cpuInfoString : String = readCpuInfo()
-        val regex = Regex(
-            """processor\s*:\s*\d+\s*vendor_id\s*:\s*(\w+)\s*cpu family\s*:\s*\d+\s*model\s*:\s*\d+\s*model name\s*:\s*([\w\s]+)\s*stepping\s*:\s*\d+\s*microcode\s*:\s*\S+\s*cpu MHz\s*:\s*(\d+\.\d+)\s*cache size\s*:\s*(\d+)\s\w+\s*physical id\s*:\s*\d+\s*siblings\s*:\s*(\d+)\s*core id\s*:\s*\d+\s*cpu cores\s*:\s*(\d+)\s*apicid\s*:\s*\d+\s*initial apicid\s*:\s*\d+\s*fpu\s*:\s*\w+\s*fpu_exception\s*:\s*\w+\s*cpuid level\s*:\s*\d+\s*wp\s*:\s*\w+\s*flags\s*:\s*[\w\s]+\s*bugs\s*:\s*[\w\s]+\s*bogomips\s*:\s*\d+\.\d+\s*TLB size\s*:\s*\d+\s\w+\s\w+\s*clflush size\s*:\s*\d+\s*cache_alignment\s*:\s*\d+\s*address sizes\s*:\s*[\d\s\w,]+\s*power management\s*:"""
-        )
 
-        val matchResult = regex.find(cpuInfoString)
-        if (matchResult != null){
-            val (vendor, model, frequency, cacheSize, siblings, cores) = matchResult.destructured
-            return CpuInfo(
-                vendor,
-                model,
-                cores.toInt(),
-                siblings.toInt(),
-                frequency.toDouble(),
-                Build.SUPPORTED_ABIS[0],
-                cacheSize.toInt()
-            )
-        } else {
-            return CpuInfo(
-                "Unknown",
-                "Unknown",
-                0,
-                0,
-                0.0,
-                "Unknown",
-                0
-            )
-        }
+        val vendor = Util.extractRegexFromString("""vendor_id\s*:\s*(\w+)""", cpuInfoString) ?: "Unknown"
+        val model = Util.extractRegexFromString("""model name\s*:\s*([^\n]+)""", cpuInfoString) ?: "Unknown"
+        val frequency = Util.extractRegexFromString("""cpu MHz\s*:\s*(\d+\.\d+)""", cpuInfoString)?.toDouble() ?: 0.0
+        val cacheSize = Util.extractRegexFromString("""cache size\s*:\s*(\d+)\s\w+""", cpuInfoString)?.toInt() ?: 0
+        val siblings = Util.extractRegexFromString("""siblings\s*:\s*(\d+)""", cpuInfoString)?.toInt() ?: 0
+        val cores = Util.extractRegexFromString("""cpu cores\s*:\s*(\d+)""", cpuInfoString)?.toInt() ?: 0
+
+        return CpuInfo(
+            vendor,
+            model,
+            cores,
+            siblings,
+            frequency,
+            Build.SUPPORTED_ABIS[0],
+            cacheSize
+        )
     }
 
     private fun getMemoryInfo() : MemoryInfo{
