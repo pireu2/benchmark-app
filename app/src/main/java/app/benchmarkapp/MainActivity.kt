@@ -1,13 +1,13 @@
 package app.benchmarkapp
 
-import android.bluetooth.BluetoothClass.Device
-import app.benchmarkapp.DeviceInfoProvider
 
+import androidx.compose.runtime.*
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -18,22 +18,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import app.benchmarkapp.ui.theme.BenchmarkAppTheme
+import kotlinx.coroutines.delay
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             BenchmarkAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SpecsWidget(this, Modifier.padding(innerPadding))
+                    Column(modifier = Modifier.padding(innerPadding)) {
+                        SpecsWidget(this@MainActivity, Modifier.padding(innerPadding))
+                    }
+
                 }
             }
         }
     }
 }
-
-
 
 
 fun getDeviceSpecs(context: Context) : String{
@@ -61,15 +65,22 @@ fun getDeviceSpecs(context: Context) : String{
         GPU Info:
             Vendor: ${deviceInfo.gpu?.vendor}
             Model: ${deviceInfo.gpu?.model}
-            Version: ${deviceInfo.gpu?.frequency}
-            Memory Size: ${deviceInfo.gpu?.memorySize}
+            Shading Language Version: ${deviceInfo.gpu?.shadingLanguageVersion}
             Version: ${deviceInfo.gpu?.version}
     """.trimIndent()
 }
 
 @Composable
 fun SpecsWidget(context: Context, modifier: Modifier = Modifier) {
+    var specs by remember { mutableStateOf(getDeviceSpecs(context)) }
+
+    LaunchedEffect(Unit) {
+        delay(10)
+        val newSpecs = getDeviceSpecs(context)
+        specs = newSpecs
+    }
+
     Surface(color = Color.White) {
-        Text(text = getDeviceSpecs(context), modifier = modifier.padding(16.dp))
+        Text(text = specs, modifier = modifier.padding(16.dp))
     }
 }

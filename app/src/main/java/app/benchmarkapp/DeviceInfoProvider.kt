@@ -1,20 +1,16 @@
 package app.benchmarkapp
 
-import app.benchmarkapp.Util
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
-import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.view.WindowManager
 import android.widget.FrameLayout
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
-import javax.microedition.khronos.opengles.GL10
-import javax.microedition.khronos.egl.EGLConfig
 
 
 /**
@@ -77,15 +73,14 @@ class DeviceInfoProvider(private val context: Context) {
     /**
      * @param vendor GPU vendor
      * @param model GPU model
-     * @param frequency GPU frequency in MHz
-     * @param architecture GPU architecture
-     * @param memorySize GPU memory size in MB
+     * @param extensions Supported extensions
+     * @param shadingLanguageVersion Supported shading language version
+     * @param version OpenGL version
      */
     data class GpuInfo(
         val vendor: String,
         val model: String,
-        val frequency: Double,
-        val memorySize: Int,
+        val shadingLanguageVersion: String,
         val version: String
     )
 
@@ -126,22 +121,7 @@ class DeviceInfoProvider(private val context: Context) {
     private fun getGpuInfo() : GpuInfo{
         val glSurfaceView = GLSurfaceView(context)
         glSurfaceView.setEGLContextClientVersion(2)
-        val renderer = object : GLSurfaceView.Renderer {
-            var vendor: String = "Unknown"
-            var model: String = "Unknown"
-            var version: String = "Unknown"
-
-            override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-                vendor = GLES20.glGetString(GLES20.GL_VENDOR)
-                model = GLES20.glGetString(GLES20.GL_RENDERER)
-                version = GLES20.glGetString(GLES20.GL_VERSION)
-            }
-
-            override fun onDrawFrame(gl: GL10?) {}
-            override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {}
-        }
-
-        glSurfaceView.setRenderer(renderer)
+        glSurfaceView.setRenderer(Renderer)
         glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
         val frameLayout = FrameLayout(context)
@@ -155,11 +135,10 @@ class DeviceInfoProvider(private val context: Context) {
         windowManager.removeView(frameLayout)
 
         return GpuInfo(
-            renderer.vendor,
-            renderer.model,
-            0.0,
-            0,
-            renderer.version
+            Renderer.vendor,
+            Renderer.model,
+            Renderer.shadingLanguageVersion,
+            Renderer.version
         )
     }
 
