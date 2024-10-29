@@ -1,5 +1,6 @@
 package app.benchmarkapp.ui.components
 
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,20 +14,18 @@ import androidx.compose.ui.unit.dp
 import app.benchmarkapp.DeviceInfoProvider
 
 @Composable
-fun CpuInfoWidget(info : DeviceInfoProvider.CpuInfo){
+fun DeviceInfoWidget(info : DeviceInfoProvider.DeviceInfo){
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = "CPU Information", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(text = "Device Information", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Text(text = "Model: ${info.model}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Cores: ${info.totalCores}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Physical Cores: ${info.physicalCores}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Clock Speed: ${info.frequency} GHz", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Cache Size: ${info.cacheSize} MB", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Architecture: ${info.architecture}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Brand: ${info.brand}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Sdk: ${info.sdk}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Display: ${info.display}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

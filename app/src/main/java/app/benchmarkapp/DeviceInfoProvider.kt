@@ -2,16 +2,18 @@ package app.benchmarkapp
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.opengl.GLSurfaceView
+import android.os.BatteryManager
 import android.view.WindowManager
 import android.widget.FrameLayout
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
-import kotlinx.coroutines.*
 
 
 
@@ -24,19 +26,21 @@ class DeviceInfoProvider(private val context: Context) {
     /**
      * @param model Device model
      * @param brand Device brand
-     * @param version Android version
+     * @param display Device display
      * @param sdk Android SDK version
      * @param cpu CPU info
      * @param memory Memory info
+     * @param battery Battery info
      * @param gpu GPU info
      */
     data class DeviceInfo(
         val model: String,
         val brand: String,
-        val version: String,
+        val display: String,
         val sdk: Int,
         val cpu: CpuInfo,
         val memory: MemoryInfo,
+        val battery: BatteryInfo,
         val gpu: GpuInfo? = null
     )
 
@@ -85,6 +89,23 @@ class DeviceInfoProvider(private val context: Context) {
         val version: String
     )
 
+    /**
+     * @param totalCapacity Battery total capacity in mAh
+     * @param remainingCapacity Battery remaining capacity in mAh
+     * @param health Battery health
+     * @param status Battery status
+     * @param voltage Battery voltage in mV
+     * @param temperature Battery temperature in °C
+     */
+    data class BatteryInfo(
+        val totalCapacity: Long,
+        val remainingCapacity: Int,
+        val health: Int,
+        val status: Int,
+        val voltage: Int,
+        val temperature: Int
+    )
+
     private var deviceInfo: DeviceInfo
 
     init {
@@ -96,27 +117,51 @@ class DeviceInfoProvider(private val context: Context) {
         return deviceInfo
     }
 
+
     private fun createDeviceInfo() : DeviceInfo{
         return if(supportsGpu()){
             DeviceInfo(
                 Build.MODEL,
                 Build.BRAND,
-                Build.VERSION.RELEASE,
+                Build.DISPLAY,
                 Build.VERSION.SDK_INT,
                 getCpuInfo(),
                 getMemoryInfo(),
+                getBatteryInfo(),
                 getGpuInfo()
             )
         } else {
             DeviceInfo(
                 Build.MODEL,
                 Build.BRAND,
-                Build.VERSION.RELEASE,
+                Build.DISPLAY,
                 Build.VERSION.SDK_INT,
                 getCpuInfo(),
                 getMemoryInfo(),
+                getBatteryInfo()
             )
         }
+    }
+
+    private fun getBatteryInfo() : BatteryInfo{
+        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+
+        val totalCapacity =  batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        val remainingCapacity = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val batteryHealth = intent?.getIntExtra(BatteryManager.EXTRA_HEALTH, -1) ?: -1
+        val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val voltage = intent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1) ?: -1
+        val temperature = intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
+
+        return BatteryInfo(
+            totalCapacity,
+            remainingCapacity,
+            batteryHealth,
+            status,
+            voltage,
+            temperature,
+        )
     }
 
     private fun supportsGpu() : Boolean{
