@@ -11,6 +11,8 @@ import android.widget.FrameLayout
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.IOException
+import kotlinx.coroutines.*
+
 
 
 /**
@@ -73,7 +75,6 @@ class DeviceInfoProvider(private val context: Context) {
     /**
      * @param vendor GPU vendor
      * @param model GPU model
-     * @param extensions Supported extensions
      * @param shadingLanguageVersion Supported shading language version
      * @param version OpenGL version
      */
@@ -84,11 +85,20 @@ class DeviceInfoProvider(private val context: Context) {
         val version: String
     )
 
-    private val deviceInfo: DeviceInfo
+    private var deviceInfo: DeviceInfo
 
     init {
-        if(supportsGpu()){
-            deviceInfo = DeviceInfo(
+        deviceInfo = createDeviceInfo()
+    }
+
+    fun getDeviceInfo() : DeviceInfo{
+        deviceInfo = createDeviceInfo()
+        return deviceInfo
+    }
+
+    private fun createDeviceInfo() : DeviceInfo{
+        return if(supportsGpu()){
+            DeviceInfo(
                 Build.MODEL,
                 Build.BRAND,
                 Build.VERSION.RELEASE,
@@ -98,7 +108,7 @@ class DeviceInfoProvider(private val context: Context) {
                 getGpuInfo()
             )
         } else {
-            deviceInfo = DeviceInfo(
+            DeviceInfo(
                 Build.MODEL,
                 Build.BRAND,
                 Build.VERSION.RELEASE,
@@ -107,10 +117,6 @@ class DeviceInfoProvider(private val context: Context) {
                 getMemoryInfo(),
             )
         }
-    }
-
-    fun getDeviceInfo() : DeviceInfo{
-        return deviceInfo
     }
 
     private fun supportsGpu() : Boolean{
