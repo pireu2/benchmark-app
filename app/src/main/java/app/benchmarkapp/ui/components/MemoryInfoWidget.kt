@@ -2,8 +2,10 @@ package app.benchmarkapp.ui.components
 
 
 import CircularProgress
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -26,7 +28,10 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(text = "Memory Information", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Row {
-                Column (modifier = Modifier.padding(8.dp)) {
+                Column (modifier = Modifier
+                    .padding(top = 8.dp, end = 8.dp, bottom = 8.dp)
+                    .fillMaxHeight()
+                ) {
                     Text(
                         text = "Total RAM: ${info.totalRam / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
@@ -35,15 +40,19 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                         text = "Available RAM: ${info.availableRam / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    CircularProgress(
-                        total = info.totalRam.toFloat(),
-                        available = info.availableRam.toFloat(),
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
+                    Box (modifier = Modifier.align(Alignment.CenterHorizontally)){
+                        CircularProgress(
+                            total = info.totalRam.toFloat(),
+                            available = info.availableRam.toFloat(),
+                            modifier = Modifier
+                                .padding(top = 16.dp)
+                        )
+                    }
                 }
-                Column (modifier = Modifier.padding(top=8.dp, bottom = 8.dp, start = 8.dp)) {
+                Column (modifier = Modifier
+                    .padding(top=8.dp, start=8.dp, bottom = 8.dp)
+                    .fillMaxHeight()
+                ) {
                     Text(
                         text = "Total Storage: ${info.totalStorage / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
@@ -52,13 +61,14 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                         text = "Available Storage: ${info.availableStorage / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    CircularProgress(
-                        total = info.totalStorage.toFloat(),
-                        available = info.availableStorage.toFloat(),
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
+                    Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        CircularProgress(
+                            total = info.totalStorage.toFloat(),
+                            available = info.availableStorage.toFloat(),
+                            modifier = Modifier
+                                .padding(top = 16.dp)
+                        )
+                    }
                 }
             }
         }
