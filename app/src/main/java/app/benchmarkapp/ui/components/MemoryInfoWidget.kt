@@ -43,7 +43,7 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                             .align(Alignment.CenterHorizontally)
                     )
                 }
-                Column (modifier = Modifier.padding(8.dp)) {
+                Column (modifier = Modifier.padding(top=8.dp, bottom = 8.dp, start = 8.dp)) {
                     Text(
                         text = "Total Storage: ${info.totalStorage / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
