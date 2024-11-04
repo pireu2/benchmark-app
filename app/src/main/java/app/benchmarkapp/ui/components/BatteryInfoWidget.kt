@@ -20,8 +20,8 @@ import app.benchmarkapp.ui.theme.Green40
 @Composable
 fun BatteryInfoWidget(info : DeviceInfoProvider.BatteryInfo){
     val status = when(info.status){
-        1 -> "Charging"
-        2 -> "Discharging"
+        1 -> "Discharging"
+        2 -> "Charging"
         3 -> "Not Charging"
         4 -> "Full"
         else -> "Unknown"
@@ -53,7 +53,7 @@ fun BatteryInfoWidget(info : DeviceInfoProvider.BatteryInfo){
                 )
                 Text(text = "Status: $status", style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    text = "Temperature: ${info.temperature}°C",
+                    text = "Temperature: ${info.temperature / 10}°C",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

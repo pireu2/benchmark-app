@@ -9,6 +9,7 @@ import android.os.Environment
 import android.os.StatFs
 import android.opengl.GLSurfaceView
 import android.os.BatteryManager
+import android.util.Log
 import android.view.WindowManager
 import android.widget.FrameLayout
 import java.io.BufferedReader
@@ -235,9 +236,11 @@ class DeviceInfoProvider(private val context: Context) {
         return  try{
             val reader = BufferedReader(FileReader("/proc/cpuinfo"))
             val cpuInfo = reader.readText()
+            Log.d("CpuInfo", cpuInfo)
             reader.close()
             cpuInfo
         } catch (e: IOException){
+            Log.e("CpuInfo", "Error reading /proc/cpuinfo", e)
             "Unavailable"
         }
     }
