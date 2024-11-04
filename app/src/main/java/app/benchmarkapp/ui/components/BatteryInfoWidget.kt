@@ -1,6 +1,9 @@
 package app.benchmarkapp.ui.components
 
 import CircularProgress
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,55 +20,63 @@ import androidx.compose.ui.unit.dp
 import app.benchmarkapp.DeviceInfoProvider
 import app.benchmarkapp.ui.theme.Green40
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BatteryInfoWidget(info : DeviceInfoProvider.BatteryInfo){
-    val status = when(info.status){
-        1 -> "Discharging"
-        2 -> "Charging"
-        3 -> "Not Charging"
-        4 -> "Full"
-        else -> "Unknown"
-    }
+    val chargingStatus = DeviceInfoProvider.getChargingStatus(info.status)
+    val healthStatus = DeviceInfoProvider.getBatteryHealthStatus(info.health)
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
     ) {
-        Row {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Text(
-                    text = "Battery Information",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = "Health: ${info.health}", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    text = "Total Capacity: ${info.totalCapacity}%",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Current Capacity: ${info.remainingCapacity}%",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Voltage: ${info.voltage} mV",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(text = "Status: $status", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    text = "Temperature: ${info.temperature / 10}°C",
-                    style = MaterialTheme.typography.bodyMedium
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                text = "Battery Information",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(modifier = Modifier
+                    .padding(8.dp)
+                ) {
+                    Text(text = "Health: $healthStatus", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Total Capacity: ${info.totalCapacity} mAh",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Current Capacity: ${info.remainingCapacity} mAh",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Voltage: ${info.voltage} mV",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(text = "Status: $chargingStatus", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Temperature: ${info.temperature}°C",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                CircularProgress(
+                    total = info.totalCapacity.toFloat(),
+                    available = info.remainingCapacity.toFloat(),
+                    color = Green40,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.CenterVertically)
+                        .fillMaxHeight()
                 )
             }
-            CircularProgress(
-                total = info.totalCapacity.toFloat(),
-                available = info.remainingCapacity.toFloat(),
-                color = Green40,
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .align(Alignment.CenterVertically)
-                    .fillMaxHeight()
-            )
         }
+
     }
 }

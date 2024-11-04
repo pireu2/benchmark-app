@@ -2,6 +2,7 @@ package app.benchmarkapp.ui.components
 
 
 import CircularProgress
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,17 +28,22 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(text = "Memory Information", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Row {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 Column (modifier = Modifier
-                    .padding(top = 8.dp, end = 8.dp, bottom = 8.dp)
+                    .padding(8.dp)
                     .fillMaxHeight()
                 ) {
                     Text(
-                        text = "Total RAM: ${info.totalRam / 1000000} MB",
+                        text = "Total RAM:\n ${info.totalRam / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Available RAM: ${info.availableRam / 1000000} MB",
+                        text = "Available RAM:\n ${info.availableRam / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Box (modifier = Modifier.align(Alignment.CenterHorizontally)){
@@ -50,15 +56,16 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                     }
                 }
                 Column (modifier = Modifier
-                    .padding(top=8.dp, start=8.dp, bottom = 8.dp)
+                    .padding(8.dp)
                     .fillMaxHeight()
+
                 ) {
                     Text(
-                        text = "Total Storage: ${info.totalStorage / 1000000} MB",
+                        text = "Total Storage:\n ${info.totalStorage / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Available Storage: ${info.availableStorage / 1000000} MB",
+                        text = "Available Storage:\n ${info.availableStorage / 1000000} MB",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {

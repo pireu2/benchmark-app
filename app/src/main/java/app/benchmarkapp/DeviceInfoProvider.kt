@@ -12,7 +12,9 @@ import android.os.BatteryManager
 import android.util.Log
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.annotation.RequiresApi
 import java.io.BufferedReader
+import java.io.File
 import java.io.FileReader
 import java.io.IOException
 
@@ -22,6 +24,7 @@ import java.io.IOException
  * Provides device information
  * @param context Application context
  */
+@RequiresApi(Build.VERSION_CODES.S)
 class DeviceInfoProvider(private val context: Context) {
 
     /**
@@ -48,20 +51,16 @@ class DeviceInfoProvider(private val context: Context) {
     /**
      * @param vendor CPU vendor
      * @param model CPU model
-     * @param physicalCores Number of physical cores
-     * @param totalCores Total number of cores
+     * @param cores Number of  cores
      * @param frequency CPU frequency in MHz
      * @param architecture CPU architecture
-     * @param cacheSize CPU cache size in KB
      */
     data class CpuInfo(
         val vendor: String,
         val model: String,
-        val physicalCores: Int,
-        val totalCores: Int,
+        val cores: Int,
         val frequency: Double,
-        val architecture: String,
-        val cacheSize: Int
+        val architecture: String
     )
 
     /**
@@ -99,7 +98,7 @@ class DeviceInfoProvider(private val context: Context) {
      * @param temperature Battery temperature in °C
      */
     data class BatteryInfo(
-        val totalCapacity: Long,
+        val totalCapacity: Int,
         val remainingCapacity: Int,
         val health: Int,
         val status: Int,
@@ -113,12 +112,39 @@ class DeviceInfoProvider(private val context: Context) {
         deviceInfo = createDeviceInfo()
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     fun getDeviceInfo() : DeviceInfo{
         deviceInfo = createDeviceInfo()
         return deviceInfo
     }
 
+    companion object{
+        fun getBatteryHealthStatus(health: Int): String {
+            return when (health) {
+                BatteryManager.BATTERY_HEALTH_UNKNOWN -> "Unknown"
+                BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
+                BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
+                BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
+                BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Over Voltage"
+                BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified Failure"
+                BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
+                else -> "Unknown"
+            }
+        }
 
+        fun getChargingStatus(status: Int): String {
+            return when (status) {
+                BatteryManager.BATTERY_STATUS_CHARGING -> "Charging"
+                BatteryManager.BATTERY_STATUS_DISCHARGING -> "Discharging"
+                BatteryManager.BATTERY_STATUS_NOT_CHARGING -> "Not Charging"
+                BatteryManager.BATTERY_STATUS_FULL -> "Full"
+                else -> "Unknown"
+            }
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun createDeviceInfo() : DeviceInfo{
         return if(supportsGpu()){
             DeviceInfo(
@@ -148,12 +174,14 @@ class DeviceInfoProvider(private val context: Context) {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
-        val totalCapacity =  batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        val remainingCapacity = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val remainingCapacity = batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER).toInt() / 1000
+        val totalCapacity = ((1 / (batteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY).toDouble() / 100)) * remainingCapacity).toInt()
         val batteryHealth = intent?.getIntExtra(BatteryManager.EXTRA_HEALTH, -1) ?: -1
         val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
         val voltage = intent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1) ?: -1
-        val temperature = intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
+        val temperature = (intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1) / 10
+
+
 
         return BatteryInfo(
             totalCapacity,
@@ -194,26 +222,45 @@ class DeviceInfoProvider(private val context: Context) {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun getCpuInfo() : CpuInfo{
         val cpuInfoString : String = readCpuInfo()
+        var vendor: String
+        var model: String
 
-        val vendor = Util.extractRegexFromString("""vendor_id\s*:\s*(\w+)""", cpuInfoString) ?: "Unknown"
-        val model = Util.extractRegexFromString("""model name\s*:\s*([^\n]+)""", cpuInfoString) ?: "Unknown"
-        val frequency = Util.extractRegexFromString("""cpu MHz\s*:\s*(\d+\.\d+)""", cpuInfoString)?.toDouble() ?: 0.0
-        val cacheSize = Util.extractRegexFromString("""cache size\s*:\s*(\d+)\s\w+""", cpuInfoString)?.toInt() ?: 0
-        val siblings = Util.extractRegexFromString("""siblings\s*:\s*(\d+)""", cpuInfoString)?.toInt() ?: 0
-        val cores = Util.extractRegexFromString("""cpu cores\s*:\s*(\d+)""", cpuInfoString)?.toInt() ?: 0
+        try{
+            vendor = Build.SOC_MANUFACTURER
+            model = Build.SOC_MODEL
+        }
+        catch (e: NoSuchFieldError){
+            vendor = Util.extractRegexFromString("""Hardware\s*:\s*vendor\s*(\w+)""", cpuInfoString) ?: "Unknown"
+            model = Util.extractRegexFromString("""Processor\s*:\s*([^\n]+)""", cpuInfoString) ?: "Unknown"
+        }
 
         return CpuInfo(
             vendor,
             model,
-            cores,
-            siblings,
-            frequency,
-            Build.SUPPORTED_ABIS[0],
-            cacheSize
+            Runtime.getRuntime().availableProcessors(),
+            getCurrentCpuFrequency(),
+            Build.SUPPORTED_ABIS[0]
         )
     }
+
+    private fun getCurrentCpuFrequency(): Double {
+        return try {
+            val file = File("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+            if (file.exists()) {
+                val frequency = file.readText().trim().toDouble() / 1000 // Convert from kHz to MHz
+                frequency
+            } else {
+                0.0
+            }
+        } catch (e: IOException) {
+            Log.e("CpuInfo", "Error reading CPU frequency", e)
+            0.0
+        }
+    }
+
 
     private fun getMemoryInfo() : MemoryInfo{
         val statFs = StatFs(Environment.getDataDirectory().path)
@@ -236,7 +283,6 @@ class DeviceInfoProvider(private val context: Context) {
         return  try{
             val reader = BufferedReader(FileReader("/proc/cpuinfo"))
             val cpuInfo = reader.readText()
-            Log.d("CpuInfo", cpuInfo)
             reader.close()
             cpuInfo
         } catch (e: IOException){

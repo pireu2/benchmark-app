@@ -21,11 +21,10 @@ fun CpuInfoWidget(info : DeviceInfoProvider.CpuInfo){
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(text = "CPU Information", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(text = "Vendor: ${info.vendor}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Model: ${info.model}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Cores: ${info.totalCores}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Physical Cores: ${info.physicalCores}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Clock Speed: ${info.frequency} GHz", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Cache Size: ${info.cacheSize} MB", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Cores: ${info.cores}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Clock Speed: ${info.frequency} MHz", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Architecture: ${info.architecture}", style = MaterialTheme.typography.bodyMedium)
         }
     }
