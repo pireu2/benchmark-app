@@ -3,7 +3,11 @@ package app.benchmarkapp.ui.components
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import app.benchmarkapp.ui.theme.backgroundColor
+import app.benchmarkapp.ui.theme.textColor
 import kotlinx.coroutines.launch
 
 
@@ -45,6 +50,20 @@ fun SideMenu(drawerState: DrawerState, navController: NavController) {
         drawerContentColor = backgroundColor,
     ){
         Spacer(modifier = Modifier.height(16.dp))
+        IconButton(
+            modifier = Modifier.padding(start = 8.dp),
+            onClick = {
+                scope.launch {
+                    drawerState.close()
+                }
+            },
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Close",
+                tint = textColor
+            )
+        }
         items.forEachIndexed { index, item ->
             NavigationDrawerItem(
                 colors = NavigationDrawerItemDefaults.colors(

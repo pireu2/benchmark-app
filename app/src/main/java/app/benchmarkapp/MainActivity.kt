@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.benchmarkapp.ui.components.CpuBenchmarkWidget
 import app.benchmarkapp.ui.components.HomeWidget
 import app.benchmarkapp.ui.components.SideMenu
 import app.benchmarkapp.ui.components.SpecsWidget
@@ -23,6 +24,13 @@ import app.benchmarkapp.ui.components.TitleBar
 
 
 class MainActivity : ComponentActivity() {
+    companion object
+    {
+        init{
+            System.loadLibrary("benchmarkapp")
+        }
+        external fun cpuBenchmark(): Long
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,7 +58,7 @@ class MainActivity : ComponentActivity() {
                             NavHost(navController = navController, startDestination = "home") {
                                 composable("home") { HomeWidget(context = this@MainActivity) }
                                 composable("device_info") { SpecsWidget(context = this@MainActivity) }
-                                composable("cpu_benchmark") { /* TODO */ }
+                                composable("cpu_benchmark") { CpuBenchmarkWidget { cpuBenchmark() } }
                                 composable("gpu_benchmark") { /* TODO */ }
                                 composable("ram_benchmark") { /* TODO */ }
                                 composable("storage_benchmark") { /* TODO */ }
