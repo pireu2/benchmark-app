@@ -106,16 +106,14 @@ class DeviceInfoProvider(private val context: Context) {
         val temperature: Int
     )
 
-    private var deviceInfo: DeviceInfo
 
     init {
-        deviceInfo = createDeviceInfo()
+        DeviceStats.deviceInfo = createDeviceInfo()
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    fun getDeviceInfo() : DeviceInfo{
-        deviceInfo = createDeviceInfo()
-        return deviceInfo
+    fun updateDeviceInfo(){
+        DeviceStats.deviceInfo = createDeviceInfo()
     }
 
     companion object{

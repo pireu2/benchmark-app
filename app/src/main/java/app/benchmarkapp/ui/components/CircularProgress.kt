@@ -9,9 +9,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.benchmarkapp.ui.theme.Purple40
+import app.benchmarkapp.ui.theme.textColor
 
 @Composable
 fun CircularProgress(
@@ -20,12 +22,13 @@ fun CircularProgress(
     modifier: Modifier = Modifier,
     color: Color = Purple40,
     backgroundColor: Color = Color.LightGray,
-    strokeWidth: Float = 16f
+    strokeWidth: Float = 16f,
+    circleSize: Dp = 100.dp
 ) {
     val progress = available / total
     val percentage = (progress * 100).toInt()
 
-    Box(contentAlignment = Alignment.Center, modifier = modifier.size(100.dp)) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier.size(circleSize)) {
         Canvas(modifier = Modifier.matchParentSize()) {
             drawCircle(
                 color = backgroundColor,
@@ -33,7 +36,7 @@ fun CircularProgress(
                 style = Stroke(width = strokeWidth)
             )
 
-            // Draw progress arc
+            // Draw progressSingleThreaded arc
             drawArc(
                 color = color,
                 startAngle = -90f,
@@ -42,6 +45,6 @@ fun CircularProgress(
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
         }
-        Text(text = "$percentage%", fontSize = 16.sp, color = color, fontWeight = FontWeight.Bold)
+        Text(text = "$percentage%", fontSize = 16.sp, color = textColor, fontWeight = FontWeight.Bold)
     }
 }

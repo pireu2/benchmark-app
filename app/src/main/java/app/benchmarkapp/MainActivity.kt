@@ -1,5 +1,6 @@
 package app.benchmarkapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,8 +30,12 @@ class MainActivity : ComponentActivity() {
         init{
             System.loadLibrary("benchmarkapp")
         }
-        external fun cpuBenchmark(): Long
+        external fun singleThreadedBenchmark(): Long
+        external fun getSingleThreadedProgress(): Float
+        external fun multiThreadedBenchmark(): Long
+        external fun getMultiThreadedProgress(): Float
     }
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,6 +44,7 @@ class MainActivity : ComponentActivity() {
             BenchmarkAppTheme {
                 val navController = rememberNavController()
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
+                DeviceInfoProvider(this).updateDeviceInfo()
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
@@ -57,8 +63,8 @@ class MainActivity : ComponentActivity() {
                         Column(modifier = Modifier.padding(innerPadding)) {
                             NavHost(navController = navController, startDestination = "home") {
                                 composable("home") { HomeWidget(context = this@MainActivity) }
-                                composable("device_info") { SpecsWidget(context = this@MainActivity) }
-                                composable("cpu_benchmark") { CpuBenchmarkWidget { cpuBenchmark() } }
+                                composable("device_info") { SpecsWidget() }
+                                composable("cpu_benchmark") { CpuBenchmarkWidget() }
                                 composable("gpu_benchmark") { /* TODO */ }
                                 composable("ram_benchmark") { /* TODO */ }
                                 composable("storage_benchmark") { /* TODO */ }

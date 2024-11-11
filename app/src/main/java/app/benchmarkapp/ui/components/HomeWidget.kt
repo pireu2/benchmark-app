@@ -17,7 +17,7 @@ import app.benchmarkapp.ui.theme.backgroundColor
 @Composable
 fun HomeWidget(context: Context, modifier: Modifier = Modifier) {
     val deviceInfoProvider = DeviceInfoProvider(context)
-    deviceInfoProvider.getDeviceInfo()
+    deviceInfoProvider.updateDeviceInfo()
 
 
 
