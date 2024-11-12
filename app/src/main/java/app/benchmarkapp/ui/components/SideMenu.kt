@@ -41,8 +41,8 @@ fun SideMenu(drawerState: DrawerState, navController: NavController) {
         "Device Info",
         "CPU Benchmark",
         "GPU Benchmark",
-        "Memory Benchmark",
-        "Battery Benchmark"
+        "RAM Benchmark",
+        "Storage Benchmark"
     )
 
     ModalDrawerSheet(

@@ -65,13 +65,14 @@ fun CpuBenchmarkWidget() {
 
     LazyColumn {
         item { Spacer(modifier = Modifier.height(8.dp)) }
+        item { CpuInfoWidget(DeviceStats.deviceInfo?.cpu ?: return@item) }
         item {
             Card(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(8.dp)) {
                     Text(
                         text = "Single Threaded Benchmark",
                         style = MaterialTheme.typography.headlineSmall,
@@ -123,7 +124,7 @@ fun CpuBenchmarkWidget() {
                         .padding(8.dp)
                         .fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(8.dp)) {
                         Text(
                             text = "Multi Threaded Benchmark",
                             style = MaterialTheme.typography.headlineSmall,
