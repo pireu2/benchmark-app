@@ -58,7 +58,7 @@ fun CpuBenchmarkWidget() {
     LaunchedEffect(Unit) {
         while (true) {
             singleThreadedProgress = MainActivity.getSingleThreadedProgress()
-            multiThreadedProgress = MainActivity.getMultiThreadedProgress()
+            cores?.let { MainActivity.getMultiThreadedProgress(it) }?.let { multiThreadedProgress = it }
             kotlinx.coroutines.delay(100)
         }
     }
@@ -145,7 +145,7 @@ fun CpuBenchmarkWidget() {
                                     if (isRunning) return@Button
                                     isRunning = true
                                     scope.launch(it.asCoroutineDispatcher()) {
-                                        multiThreadedScore = MainActivity.multiThreadedBenchmark()
+                                        multiThreadedScore = MainActivity.multiThreadedBenchmark(cores)
                                         DeviceStats.multiThreadedScore = multiThreadedScore
                                         isRunning = false
                                     }

@@ -32,8 +32,8 @@ class MainActivity : ComponentActivity() {
         }
         external fun singleThreadedBenchmark(): Long
         external fun getSingleThreadedProgress(): Float
-        external fun multiThreadedBenchmark(): Long
-        external fun getMultiThreadedProgress(): Float
+        external fun multiThreadedBenchmark(numThreads: Int): Long
+        external fun getMultiThreadedProgress(numThreads: Int): Float
     }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
