@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.benchmarkapp.graphics.Renderer
 import app.benchmarkapp.ui.components.CpuBenchmarkWidget
 import app.benchmarkapp.ui.components.GpuBenchmarkWidget
 import app.benchmarkapp.ui.components.HomeWidget

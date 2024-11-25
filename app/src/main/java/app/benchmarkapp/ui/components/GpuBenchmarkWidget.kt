@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import app.benchmarkapp.DeviceStats
-import app.benchmarkapp.Renderer
+import app.benchmarkapp.graphics.Renderer
 import app.benchmarkapp.ui.theme.Purple40
 import app.benchmarkapp.ui.theme.backgroundColor
 import kotlinx.coroutines.launch

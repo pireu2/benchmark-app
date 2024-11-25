@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
+import app.benchmarkapp.graphics.Renderer
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader

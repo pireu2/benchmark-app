@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/src/main/assets/obj/*.obj
+/app/src/main/assets/obj/*.mtl
+/app/src/main/assets/textures/*.jpeg
+
+*.obj
+*.mtl
+*.jpeg
