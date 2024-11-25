@@ -32,10 +32,6 @@ class Shader(vertexShaderCode: String, fragmentShaderCode: String) {
         GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0)
     }
 
-    fun setUniformMatrix3(name: String, matrix: FloatArray) {
-        val location = getUniformLocation(name)
-        GLES20.glUniformMatrix3fv(location, 1, false, matrix, 0)
-    }
 
     fun setUniform3f(name: String, x: Float, y: Float, z: Float) {
         val location = getUniformLocation(name)
