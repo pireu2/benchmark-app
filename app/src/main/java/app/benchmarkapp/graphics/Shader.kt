@@ -23,15 +23,11 @@ class Shader(vertexShaderCode: String, fragmentShaderCode: String) {
         return GLES20.glGetAttribLocation(program, name)
     }
 
-    fun getUniformLocation(name: String?): Int {
-        return GLES20.glGetUniformLocation(program, name)
-    }
 
     fun setUniformMatrix(name: String, matrix: FloatArray) {
         val location = getUniformLocation(name)
         GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0)
     }
-
 
     fun setUniform3f(name: String, x: Float, y: Float, z: Float) {
         val location = getUniformLocation(name)
@@ -41,6 +37,11 @@ class Shader(vertexShaderCode: String, fragmentShaderCode: String) {
     fun setUniform4f(name: String, x: Float, y: Float, z: Float, w: Float) {
         val location = getUniformLocation(name)
         GLES20.glUniform4f(location, x, y, z, w)
+    }
+
+
+    private fun getUniformLocation(name: String?): Int {
+        return GLES20.glGetUniformLocation(program, name)
     }
 
     private fun loadShader(type: Int, shaderCode: String): Int {

@@ -26,7 +26,7 @@ object Renderer : GLSurfaceView.Renderer {
     private var fragmentShaderString: String? = null
 
     private lateinit var shader: Shader
-    private lateinit var objLoader: ObjLoader
+    private lateinit var teapot: Model3D
 
     private var frameCount = 0
     private var startTime = 0L
@@ -36,7 +36,6 @@ object Renderer : GLSurfaceView.Renderer {
     private val projectionMatrix = FloatArray(16)
     private val normalMatrix = FloatArray(16)
 
-    private lateinit var vertexBuffer: Buffer
 
     private var rotationAngle = 0f
 
@@ -54,43 +53,23 @@ object Renderer : GLSurfaceView.Renderer {
             vertexShaderString ?: "",
             fragmentShaderString ?: ""
         )
-        val positionHandle = shader.getAttribLocation("vPosition")
-        val normalHandle = shader.getAttribLocation("vNormal")
-        val texCoordHandle = shader.getAttribLocation("vTexCoord")
 
-
-        vertexBuffer = ByteBuffer.allocateDirect(objLoader.getVerticesSize() * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(objLoader.getVertices())
-            .position(0)
-
-
-        GLES20.glEnableVertexAttribArray(positionHandle)
-        GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 32, vertexBuffer)
-
-        GLES20.glEnableVertexAttribArray(normalHandle)
-        GLES20.glVertexAttribPointer(normalHandle, 3, GLES20.GL_FLOAT, false, 32, vertexBuffer.position(3))
-
-        GLES20.glEnableVertexAttribArray(texCoordHandle)
-        GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 32, vertexBuffer.position(6))
-
-
+        teapot.init(shader)
     }
 
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
-        shader.use()
         initUniforms()
 
-        // Draw the first teapot
+
+       // Draw the first teapot
         Matrix.setIdentityM(modelMatrix, 0)
         Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, -2f, 0f, 0f) // Position the first teapot
         setUniforms()
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, objLoader.getVerticesSize() / 8)
+        teapot.draw(shader)
 
         // Draw the second teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -98,7 +77,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 2f, 0f, 0f) // Position the second teapot
         setUniforms()
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, objLoader.getVerticesSize() / 8)
+        teapot.draw(shader)
 
         // Draw the third teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -106,7 +85,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, 2f, 0f) // Position the third teapot
         setUniforms()
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, objLoader.getVerticesSize() / 8)
+        teapot.draw(shader)
 
         // Draw the fourth teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -114,7 +93,42 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, -2f, 0f) // Position the fourth teapot
         setUniforms()
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, objLoader.getVerticesSize() / 8)
+        teapot.draw(shader)
+
+        // Draw the fifth teapot
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
+        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
+        Matrix.translateM(modelMatrix, 0, 0f, 0f, 2f) // Position the fifth teapot
+        setUniforms()
+        teapot.draw(shader)
+
+        // Draw the sixth teapot
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
+        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
+        Matrix.translateM(modelMatrix, 0, 0f, 0f, -2f) // Position the sixth teapot
+        setUniforms()
+        teapot.draw(shader)
+
+        // Draw the seventh teapot
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
+        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
+        Matrix.translateM(modelMatrix, 0, 2f, 2f, 0f) // Position the seventh teapot
+        setUniforms()
+        teapot.draw(shader)
+
+        // Draw the eighth teapot
+        Matrix.setIdentityM(modelMatrix, 0)
+        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
+        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
+        Matrix.translateM(modelMatrix, 0, -2f, -2f, 0f) // Position the eighth teapot
+        setUniforms()
+        teapot.draw(shader)
+
+
+
 
 
         rotationAngle += 2f
@@ -139,12 +153,11 @@ object Renderer : GLSurfaceView.Renderer {
     fun getResources(context: Context) {
         vertexShaderString = loadShaderCode(context, "shaders/vertex_shader.glsl")
         fragmentShaderString = loadShaderCode(context, "shaders/fragment_shader.glsl")
-        objLoader = ObjLoader(context, "obj/teapots/teapot50segU.obj")
-        //objLoader = ObjLoader(context, "obj/teapot.obj")
+
+        teapot = Model3D(context, "obj/teapots/teapot50segU.obj")
     }
 
     private fun initUniforms() {
-
         Matrix.setIdentityM(modelMatrix, 0)
         Matrix.setIdentityM(viewMatrix, 0)
         Matrix.setIdentityM(projectionMatrix, 0)
