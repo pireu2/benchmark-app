@@ -49,7 +49,7 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                     Box (modifier = Modifier.align(Alignment.CenterHorizontally)){
                         CircularProgress(
                             total = info.totalRam.toFloat(),
-                            available = info.availableRam.toFloat(),
+                            available =  info.totalRam.toFloat() - info.availableRam.toFloat(),
                             modifier = Modifier
                                 .padding(top = 16.dp)
                         )
@@ -71,7 +71,7 @@ fun MemoryInfoWidget(info: DeviceInfoProvider.MemoryInfo) {
                     Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                         CircularProgress(
                             total = info.totalStorage.toFloat(),
-                            available = info.availableStorage.toFloat(),
+                            available = info.totalStorage.toFloat() - info.availableStorage.toFloat(),
                             modifier = Modifier
                                 .padding(top = 16.dp)
                         )

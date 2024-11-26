@@ -25,32 +25,27 @@ public:
             return 0;
         }
         progress = 0.0f;
-        std::chrono::duration<double, std::milli> scores[numFunctions];
+        std::chrono::duration<double, std::milli> totalDuration(0);
 
         for (int j = 0; j < RUNS; j++) {
             for (int i = 0; i < numFunctions; i++) {
                 auto start = std::chrono::high_resolution_clock::now();
                 functions[i]();
                 auto end = std::chrono::high_resolution_clock::now();
-                scores[i] += (end - start);
+                totalDuration += (end - start);
+
 
                 progress = static_cast<float>(j * numFunctions + i + 1) / static_cast<float>(numFunctions * RUNS);
             }
         }
 
 
-        double product = 1.0;
-        for (int i = 0; i < numFunctions; i++) {
-            product *= 1.0 / scores[i].count();
-        }
-        double geometricMean = pow(product, 1.0 / numFunctions);
-
-        return static_cast<long long>(geometricMean * 1e6);
+        return static_cast<long long>(1e8 / totalDuration.count());
     }
 
 private:
     static const unsigned int RUNS = 20;
-    static const unsigned int MATRIX_SIZE = 250;
+    static const unsigned int MATRIX_SIZE = 350;
     static const unsigned int ARRAY_SIZE = 10000;
     static const unsigned int IMAGE_SIZE = 1000;
 

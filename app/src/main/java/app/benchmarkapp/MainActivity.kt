@@ -20,6 +20,7 @@ import app.benchmarkapp.graphics.Renderer
 import app.benchmarkapp.ui.components.CpuBenchmarkWidget
 import app.benchmarkapp.ui.components.GpuBenchmarkWidget
 import app.benchmarkapp.ui.components.HomeWidget
+import app.benchmarkapp.ui.components.RamBenchmarkWidget
 import app.benchmarkapp.ui.components.SideMenu
 import app.benchmarkapp.ui.components.SpecsWidget
 import app.benchmarkapp.ui.theme.BenchmarkAppTheme
@@ -36,6 +37,9 @@ class MainActivity : ComponentActivity() {
         external fun getSingleThreadedProgress(): Float
         external fun multiThreadedBenchmark(numThreads: Int): Long
         external fun getMultiThreadedProgress(numThreads: Int): Float
+
+        external fun ramBenchmark(): Long
+        external fun getRamProgress(): Float
     }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +73,7 @@ class MainActivity : ComponentActivity() {
                                 composable("device_info") { SpecsWidget() }
                                 composable("cpu_benchmark") { CpuBenchmarkWidget() }
                                 composable("gpu_benchmark") { GpuBenchmarkWidget() }
-                                composable("ram_benchmark") { /* TODO */ }
+                                composable("ram_benchmark") { RamBenchmarkWidget() }
                                 composable("storage_benchmark") { /* TODO */ }
                             }
                         }

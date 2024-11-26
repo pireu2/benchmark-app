@@ -6,9 +6,6 @@ import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.nio.Buffer
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -154,7 +151,8 @@ object Renderer : GLSurfaceView.Renderer {
         vertexShaderString = loadShaderCode(context, "shaders/vertex_shader.glsl")
         fragmentShaderString = loadShaderCode(context, "shaders/fragment_shader.glsl")
 
-        teapot = Model3D(context, "obj/teapots/teapot50segU.obj")
+        //teapot = Model3D(context, "obj/teapots/teapot50segU.obj")
+        teapot = Model3D(context, "obj/teapot.obj")
     }
 
     private fun initUniforms() {
