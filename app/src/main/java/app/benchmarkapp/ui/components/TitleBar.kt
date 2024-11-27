@@ -12,6 +12,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.text.font.FontWeight
+import app.benchmarkapp.DeviceStats
 import app.benchmarkapp.ui.theme.Purple40
 import kotlinx.coroutines.launch
 
@@ -26,8 +27,10 @@ fun TitleBar(drawerState: DrawerState) {
             IconButton(onClick = {
                 scope.launch {
                     drawerState.open()
-                }
-            }) {
+                    }
+                },
+                enabled = !DeviceStats.disableNavigation
+                ) {
                 Icon(Icons.Filled.Menu, contentDescription = "Menu")
             }
         },

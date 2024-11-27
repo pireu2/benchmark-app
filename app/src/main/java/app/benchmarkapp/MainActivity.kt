@@ -12,19 +12,23 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.benchmarkapp.graphics.Renderer
-import app.benchmarkapp.ui.components.CpuBenchmarkWidget
-import app.benchmarkapp.ui.components.GpuBenchmarkWidget
+import app.benchmarkapp.ui.components.benchmark.CpuBenchmarkWidget
+import app.benchmarkapp.ui.components.benchmark.GpuBenchmarkWidget
 import app.benchmarkapp.ui.components.HomeWidget
-import app.benchmarkapp.ui.components.RamBenchmarkWidget
+import app.benchmarkapp.ui.components.benchmark.RamBenchmarkWidget
 import app.benchmarkapp.ui.components.SideMenu
 import app.benchmarkapp.ui.components.SpecsWidget
 import app.benchmarkapp.ui.theme.BenchmarkAppTheme
 import app.benchmarkapp.ui.components.TitleBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -45,7 +49,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Renderer.getResources(this)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            Renderer.getResources(this@MainActivity)
+        }
 
         setContent {
             BenchmarkAppTheme {

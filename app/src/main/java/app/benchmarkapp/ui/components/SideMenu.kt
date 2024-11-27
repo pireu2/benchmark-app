@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import app.benchmarkapp.DeviceStats
 import app.benchmarkapp.ui.theme.backgroundColor
 import app.benchmarkapp.ui.theme.textColor
 import kotlinx.coroutines.launch
@@ -31,6 +32,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SideMenu(drawerState: DrawerState, navController: NavController) {
+    if (DeviceStats.disableNavigation) {
+        return
+    }
+
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }

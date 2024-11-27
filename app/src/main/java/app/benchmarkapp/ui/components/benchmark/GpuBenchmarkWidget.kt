@@ -1,4 +1,4 @@
-package app.benchmarkapp.ui.components
+package app.benchmarkapp.ui.components.benchmark
 
 import CircularProgress
 import android.annotation.SuppressLint
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import app.benchmarkapp.DeviceStats
 import app.benchmarkapp.graphics.Renderer
+import app.benchmarkapp.ui.components.GpuInfoWidget
 import app.benchmarkapp.ui.theme.Purple40
 import app.benchmarkapp.ui.theme.backgroundColor
 import kotlinx.coroutines.launch
@@ -38,6 +39,10 @@ import kotlin.math.floor
 @SuppressLint("NewApi")
 @Composable
 fun GpuBenchmarkWidget(modifier: Modifier = Modifier) {
+    if (!Renderer.loaded){
+        return Text("Loading...")
+    }
+
     var isRunning by remember { mutableStateOf(false) }
     var fps by remember { mutableStateOf(0.0) }
     val scope = rememberCoroutineScope()
@@ -98,9 +103,11 @@ fun GpuBenchmarkWidget(modifier: Modifier = Modifier) {
                             onClick = {
                                 if (isRunning) return@Button
                                 isRunning = true
+                                DeviceStats.disableNavigation = true
                                 scope.launch {
                                     fps = Renderer.fps
                                     isRunning = false
+                                    DeviceStats.disableNavigation = false
                                 }
                             }
                         ) {

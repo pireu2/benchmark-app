@@ -1,4 +1,4 @@
-package app.benchmarkapp.ui.components
+package app.benchmarkapp.ui.components.benchmark
 
 
 import CircularProgress
@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.benchmarkapp.DeviceStats
 import app.benchmarkapp.MainActivity
+import app.benchmarkapp.ui.components.MemoryInfoWidget
 import app.benchmarkapp.ui.theme.Purple40
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -86,10 +87,12 @@ fun RamBenchmarkWidget() {
                             onClick = {
                                 if (isRunning) return@Button
                                 isRunning = true
+                                DeviceStats.disableNavigation = true
                                 scope.launch(threadDispatcher.asCoroutineDispatcher()) {
                                     score = MainActivity.ramBenchmark()
                                     DeviceStats.ramScore = score
                                     isRunning = false
+                                    DeviceStats.disableNavigation = false
                                 }
                             }
                         ) {

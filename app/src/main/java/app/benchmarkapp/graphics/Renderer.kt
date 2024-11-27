@@ -4,6 +4,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import app.benchmarkapp.DeviceStats
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.microedition.khronos.egl.EGLConfig
@@ -17,13 +18,15 @@ object Renderer : GLSurfaceView.Renderer {
     var shadingLanguageVersion: String = "Unknown"
     var fps = 0.0
 
+    var loaded: Boolean = false
+
     private var ratio : Float = 0.0f
 
     private var vertexShaderString: String? = null
     private var fragmentShaderString: String? = null
 
     private lateinit var shader: Shader
-    private lateinit var teapot: Model3D
+    private var teapot: Model3D? = null
 
     private var frameCount = 0
     private var startTime = 0L
@@ -51,7 +54,7 @@ object Renderer : GLSurfaceView.Renderer {
             fragmentShaderString ?: ""
         )
 
-        teapot.init(shader)
+        teapot?.init(shader)
     }
 
     override fun onDrawFrame(gl: GL10?) {
@@ -66,7 +69,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, -2f, 0f, 0f) // Position the first teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the second teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -74,7 +77,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 2f, 0f, 0f) // Position the second teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the third teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -82,7 +85,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, 2f, 0f) // Position the third teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the fourth teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -90,7 +93,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, -2f, 0f) // Position the fourth teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the fifth teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -98,7 +101,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, 0f, 2f) // Position the fifth teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the sixth teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -106,7 +109,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 0f, 0f, -2f) // Position the sixth teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the seventh teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -114,7 +117,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, 2f, 2f, 0f) // Position the seventh teapot
         setUniforms()
-        teapot.draw(shader)
+        teapot?.draw(shader)
 
         // Draw the eighth teapot
         Matrix.setIdentityM(modelMatrix, 0)
@@ -122,10 +125,7 @@ object Renderer : GLSurfaceView.Renderer {
         Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
         Matrix.translateM(modelMatrix, 0, -2f, -2f, 0f) // Position the eighth teapot
         setUniforms()
-        teapot.draw(shader)
-
-
-
+        teapot?.draw(shader)
 
 
         rotationAngle += 2f
@@ -151,8 +151,8 @@ object Renderer : GLSurfaceView.Renderer {
         vertexShaderString = loadShaderCode(context, "shaders/vertex_shader.glsl")
         fragmentShaderString = loadShaderCode(context, "shaders/fragment_shader.glsl")
 
-        //teapot = Model3D(context, "obj/teapots/teapot50segU.obj")
-        teapot = Model3D(context, "obj/teapot.obj")
+        teapot = Model3D(context, "obj/teapot50segU.obj")
+        loaded = true
     }
 
     private fun initUniforms() {

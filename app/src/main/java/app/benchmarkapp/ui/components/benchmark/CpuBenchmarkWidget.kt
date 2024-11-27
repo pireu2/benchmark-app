@@ -1,4 +1,4 @@
-package app.benchmarkapp.ui.components
+package app.benchmarkapp.ui.components.benchmark
 
 
 import CircularProgress
@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.benchmarkapp.DeviceStats
 import app.benchmarkapp.MainActivity
+import app.benchmarkapp.ui.components.CpuInfoWidget
 import app.benchmarkapp.ui.theme.Purple40
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -93,10 +94,12 @@ fun CpuBenchmarkWidget() {
                             onClick = {
                                 if (isRunning) return@Button
                                 isRunning = true
+                                DeviceStats.disableNavigation = true
                                 scope.launch(singleThreadedDispatcher.asCoroutineDispatcher()) {
                                     singleThreadedScore = MainActivity.singleThreadedBenchmark()
                                     DeviceStats.singleThreadedScore = singleThreadedScore
                                     isRunning = false
+                                    DeviceStats.disableNavigation = false
                                 }
                             }
                         ) {
@@ -145,10 +148,12 @@ fun CpuBenchmarkWidget() {
                                 onClick = {
                                     if (isRunning) return@Button
                                     isRunning = true
+                                    DeviceStats.disableNavigation = true
                                     scope.launch(it.asCoroutineDispatcher()) {
                                         multiThreadedScore = MainActivity.multiThreadedBenchmark(cores)
                                         DeviceStats.multiThreadedScore = multiThreadedScore
                                         isRunning = false
+                                        DeviceStats.disableNavigation = false
                                     }
                                 }
                             ) {
