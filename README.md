@@ -86,7 +86,7 @@ The project uses Kotlin DSL for Gradle configuration. Key configuration files in
 
 ### Android Configuration
 
-The main Android configuration is located in [app/build.gradle.kts](build.gradle.kts). Key settings include:
+The main Android configuration is located in [app/build.gradle.kts](app/build.gradle.kts). Key settings include:
 
 - `namespace`: `app.benchmarkapp`
 - `compileSdk`: 34
@@ -94,10 +94,6 @@ The main Android configuration is located in [app/build.gradle.kts](build.gradle
 - `targetSdk`: 34
 - `versionCode`: 1
 - `versionName`: "1.0"
-
-### ProGuard Configuration
-
-ProGuard rules are defined in [app/proguard-rules.pro](proguard-rules.pro).
 
 ## Code Style
 
