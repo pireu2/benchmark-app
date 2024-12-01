@@ -4,7 +4,6 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import app.benchmarkapp.DeviceStats
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.microedition.khronos.egl.EGLConfig
@@ -16,9 +15,11 @@ object Renderer : GLSurfaceView.Renderer {
     var model: String = "Unknown"
     var version: String = "Unknown"
     var shadingLanguageVersion: String = "Unknown"
-    var fps = 0.0
 
     var loaded: Boolean = false
+
+    const val BENCHMARK_DURATION = 20 // seconds
+    private var enable: Boolean = false
 
     private var ratio : Float = 0.0f
 
@@ -28,8 +29,10 @@ object Renderer : GLSurfaceView.Renderer {
     private lateinit var shader: Shader
     private var teapot: Model3D? = null
 
-    private var frameCount = 0
+    private var frameCount = 0L
     private var startTime = 0L
+    private var intervalStartTime = 0L
+    val frameCounts = mutableListOf<Int>()
 
     private val modelMatrix = FloatArray(16)
     private val viewMatrix = FloatArray(16)
@@ -38,6 +41,8 @@ object Renderer : GLSurfaceView.Renderer {
 
 
     private var rotationAngle = 0f
+
+
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         vendor = GLES20.glGetString(GLES20.GL_VENDOR)
@@ -60,84 +65,22 @@ object Renderer : GLSurfaceView.Renderer {
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
-        initUniforms()
+        if (enable) {
+            drawObjects()
+            frameCount++
+            val currentTime = System.currentTimeMillis()
+            val elapsedTime = (currentTime - startTime) / 1000.0
+            val intervalElapsedTime = (currentTime - intervalStartTime) / 1000.0
 
+            if (intervalElapsedTime >= 5) {
+                frameCounts.add(frameCount.toInt())
+                frameCount = 0L
+                intervalStartTime = currentTime
+            }
 
-       // Draw the first teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, -2f, 0f, 0f) // Position the first teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the second teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 2f, 0f, 0f) // Position the second teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the third teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 0f, 2f, 0f) // Position the third teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the fourth teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 0f, -2f, 0f) // Position the fourth teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the fifth teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 0f, 0f, 2f) // Position the fifth teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the sixth teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 0f, 0f, -2f) // Position the sixth teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the seventh teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, 2f, 2f, 0f) // Position the seventh teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-        // Draw the eighth teapot
-        Matrix.setIdentityM(modelMatrix, 0)
-        Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
-        Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
-        Matrix.translateM(modelMatrix, 0, -2f, -2f, 0f) // Position the eighth teapot
-        setUniforms()
-        teapot?.draw(shader)
-
-
-        rotationAngle += 2f
-        rotationAngle %= 360f
-
-        frameCount++
-        val currentTime = System.currentTimeMillis()
-        val elapsedTime = currentTime - startTime
-        if (elapsedTime >= 1000) {
-            fps = frameCount * 1000.0 / elapsedTime
-            frameCount = 0
-            startTime = currentTime
+            if (elapsedTime >= BENCHMARK_DURATION) {
+                enable = false
+            }
         }
     }
 
@@ -147,12 +90,44 @@ object Renderer : GLSurfaceView.Renderer {
         ratio = width.toFloat() / height.toFloat()
     }
 
+    fun getElapsedTime(): Long {
+        return (System.currentTimeMillis() - startTime) / 1000
+    }
+
+    fun startBenchmark(){
+        if (loaded) {
+            startTime = System.currentTimeMillis()
+            intervalStartTime = startTime
+            frameCount = 0L
+            frameCounts.clear()
+            enable = true
+        }
+    }
+
+
     fun getResources(context: Context) {
         vertexShaderString = loadShaderCode(context, "shaders/vertex_shader.glsl")
         fragmentShaderString = loadShaderCode(context, "shaders/fragment_shader.glsl")
 
-        teapot = Model3D(context, "obj/teapot50segU.obj")
+        teapot = Model3D(context, "obj/teapot.obj")
         loaded = true
+    }
+
+    private fun drawObjects(){
+        initUniforms()
+
+        // Draw multiple teapots
+        for (i in 0..63) {
+            Matrix.setIdentityM(modelMatrix, 0)
+            Matrix.scaleM(modelMatrix, 0, 4f, 4f, 4f)
+            Matrix.rotateM(modelMatrix, 0, rotationAngle, 0.25f, 1f, 0.5f)
+            Matrix.translateM(modelMatrix, 0, (i % 4 - 1.5f) * 2f, ((i / 4) % 4 - 1.5f) * 2f, (i / 16 - 1.5f) * 2f)
+            setUniforms()
+            teapot?.draw(shader)
+        }
+
+        rotationAngle += 2f
+        rotationAngle %= 360f
     }
 
     private fun initUniforms() {
@@ -166,32 +141,59 @@ object Renderer : GLSurfaceView.Renderer {
 
 
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 150f)
-        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -50f, 0f, 0f, 0f, 0f, 1f, 0f)
-        calculateNormalMatrix(viewMatrix, modelMatrix, normalMatrix)
+        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -75f, 0f, 0f, 0f, 0f, 1f, 0f)
+        calculateNormalMatrix()
 
         shader.setUniformMatrix("uModelMatrix", modelMatrix)
         shader.setUniformMatrix("uViewMatrix", viewMatrix)
         shader.setUniformMatrix("uProjectionMatrix", projectionMatrix)
         shader.setUniformMatrix("uNormalMatrix", normalMatrix)
 
-        val color = floatArrayOf(234.0f / 255.0f, 55.0f / 255.0f, 0f, 1.0f)
-        val lightPos = floatArrayOf(1.0f, 1.0f, 0.0f)
-        val lightColor = floatArrayOf(1.0f, 1.0f, 1.0f)
-
+        val color = floatArrayOf(234.0f / 255.0f, 55.0f / 255.0f, 15.0f /255.0f, 1.0f)
         shader.setUniform4f("uObjectColor", color[0], color[1], color[2], color[3])
-        shader.setUniform3f("uLightColor", lightColor[0], lightColor[1], lightColor[2])
-        shader.setUniform3f("uLightPos", lightPos[0], lightPos[1], lightPos[2])
+
+        val lightPositions = arrayOf(
+            floatArrayOf(10.0f, 10.0f, 10.0f),
+            floatArrayOf(-10.0f, 10.0f, 10.0f),
+            floatArrayOf(10.0f, -10.0f, 10.0f),
+            floatArrayOf(-10.0f, -10.0f, 10.0f),
+            floatArrayOf(10.0f, 10.0f, -10.0f),
+            floatArrayOf(-10.0f, 10.0f, -10.0f),
+            floatArrayOf(10.0f, -10.0f, -10.0f),
+            floatArrayOf(-10.0f, -10.0f, -10.0f),
+            floatArrayOf(0.0f, 10.0f, 0.0f),
+            floatArrayOf(0.0f, -10.0f, 0.0f)
+        )
+
+        val lightColors = arrayOf(
+            floatArrayOf(1.0f, 0.0f, 0.0f), // Red light
+            floatArrayOf(0.0f, 1.0f, 0.0f), // Green light
+            floatArrayOf(1.0f, 1.0f, 0.0f), // Yellow light
+            floatArrayOf(0.0f, 0.0f, 1.0f), // Blue light
+            floatArrayOf(1.0f, 0.0f, 1.0f), // Magenta light
+            floatArrayOf(0.0f, 1.0f, 1.0f), // Cyan light
+            floatArrayOf(1.0f, 0.5f, 0.0f), // Orange light
+            floatArrayOf(0.5f, 0.0f, 1.0f), // Purple light
+            floatArrayOf(0.5f, 0.5f, 0.5f), // Gray light
+            floatArrayOf(1.0f, 1.0f, 1.0f)  // White light
+        )
+        for (i in lightPositions.indices) {
+            shader.setUniform3f("uLightPos[$i]", lightPositions[i][0], lightPositions[i][1], lightPositions[i][2])
+            shader.setUniform3f("uLightColor[$i]", lightColors[i][0], lightColors[i][1], lightColors[i][2])
+        }
+
+
     }
 
     private fun setUniforms(){
-        calculateNormalMatrix(viewMatrix, modelMatrix, normalMatrix)
+        calculateNormalMatrix()
         shader.setUniformMatrix("uModelMatrix", modelMatrix)
         shader.setUniformMatrix("uViewMatrix", viewMatrix)
         shader.setUniformMatrix("uProjectionMatrix", projectionMatrix)
         shader.setUniformMatrix("uNormalMatrix", normalMatrix)
     }
 
-    private fun calculateNormalMatrix(viewMatrix: FloatArray, modelMatrix: FloatArray, normalMatrix: FloatArray) {
+    private fun calculateNormalMatrix() {
         val modelViewMatrix = FloatArray(16)
         val invModelViewMatrix = FloatArray(16)
 

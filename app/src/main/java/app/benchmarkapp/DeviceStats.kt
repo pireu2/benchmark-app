@@ -10,4 +10,5 @@ object DeviceStats {
     var singleThreadedScore: Long? = null
     var multiThreadedScore: Long? = null
     var ramScore: Long? = null
+    var gpuScore: Long? = null
 }
