@@ -101,6 +101,7 @@ object Renderer : GLSurfaceView.Renderer {
             frameCount = 0L
             frameCounts.clear()
             enable = true
+            rotationAngle = 0f
         }
     }
 
@@ -181,7 +182,6 @@ object Renderer : GLSurfaceView.Renderer {
             shader.setUniform3f("uLightPos[$i]", lightPositions[i][0], lightPositions[i][1], lightPositions[i][2])
             shader.setUniform3f("uLightColor[$i]", lightColors[i][0], lightColors[i][1], lightColors[i][2])
         }
-
 
     }
 
