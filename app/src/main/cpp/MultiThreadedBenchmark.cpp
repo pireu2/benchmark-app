@@ -1,60 +1,15 @@
-#include <jni.h>
-#include <chrono>
-#include <cmath>
-#include <vector>
-#include <functional>
-#include <random>
-#include <thread>
+#include "MultiThreadedBenchmark.h"
 
+namespace benchmark {
+    unsigned int MultiThreadedBenchmark::numThreads = 0;
 
-
-
-class MultiThreadedBenchmarks {
-public:
-    using BenchmarkFunction = void(*)();
-    static volatile float progress;
-    static unsigned int numThreads;
-
-    static BenchmarkFunction* getFunctions(){
-        static BenchmarkFunction functions[] = {matrixMultiplicationBenchmark, parallelMergeSortBenchmark, imageProcessingBenchmark};
-        return functions;
+    BenchmarkFunctions MultiThreadedBenchmark::getFunctions() {
+        static BenchmarkFunction functions[] = { matrixMultiplicationBenchmark, parallelMergeSortBenchmark, imageProcessingBenchmark };
+        return {functions, 3};
     }
 
-    static long long runBenchmarks(BenchmarkFunction functions[], int numFunctions) {
-        if (numFunctions <= 0) {
-            return 0;
-        }
-        progress = 0.0f;
-        std::chrono::duration<double, std::milli> totalDuration(0);
 
-        for (int j = 0; j < RUNS; j++) {
-            for (int i = 0; i < numFunctions; i++) {
-                auto start = std::chrono::high_resolution_clock::now();
-                functions[i]();
-                auto end = std::chrono::high_resolution_clock::now();
-                totalDuration += (end - start);
-
-
-                progress = static_cast<float>(j * numFunctions + i + 1) / static_cast<float>(numFunctions * RUNS);
-            }
-        }
-
-
-        return static_cast<long long>(1e8 / totalDuration.count());
-    }
-
-private:
-    static const unsigned int RUNS = 20;
-    static const unsigned int MATRIX_SIZE = 350;
-    static const unsigned int ARRAY_SIZE = 10000;
-    static const unsigned int IMAGE_SIZE = 1000;
-
-
-    //Matrix multiplication
-
-    using Matrix = std::vector<std::vector<int>>;
-
-    static void multiplyRowByMatrix(const Matrix& A, const Matrix& B, Matrix& C, int row){
+    void MultiThreadedBenchmark::multiplyRowByMatrix(const Matrix &A, const Matrix &B, Matrix &C, int row) {
         unsigned int n = B.size();
         unsigned int m = B[0].size();
 
@@ -66,7 +21,7 @@ private:
         }
     }
 
-    static void matrixMultiply(const Matrix& A, const Matrix& B, Matrix& C){
+    void MultiThreadedBenchmark::matrixMultiply(const Matrix &A, const Matrix &B, Matrix &C) {
         unsigned int rows = A.size();
         std::vector<std::thread> threads;
 
@@ -88,7 +43,7 @@ private:
         }
     }
 
-    static void matrixMultiplicationBenchmark(){
+    void MultiThreadedBenchmark::matrixMultiplicationBenchmark() {
         if(numThreads == 0){
             return;
         }
@@ -110,9 +65,7 @@ private:
         matrixMultiply(A, B, C);
     }
 
-    //Parallel merge sort
-
-    static void merge(std::vector<int>& arr, int left, int mid, int right){
+    void MultiThreadedBenchmark::merge(std::vector<int> &arr, int left, int mid, int right) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
@@ -149,7 +102,7 @@ private:
         }
     }
 
-    static void mergeSort(std::vector<int>& arr, int left, int right){
+    void MultiThreadedBenchmark::mergeSort(std::vector<int> &arr, int left, int right) {
         if (left < right) {
             int mid = left + (right - left) / 2;
 
@@ -160,7 +113,8 @@ private:
         }
     }
 
-    static void parallelMergeSort(std::vector<int>& arr, int left, int right, int depth){
+    void MultiThreadedBenchmark::parallelMergeSort(std::vector<int> &arr, int left, int right,
+                                                   int depth) {
         if (left < right) {
             if (depth <= 0) {
                 mergeSort(arr, left, right);
@@ -177,7 +131,7 @@ private:
         }
     }
 
-    static void parallelMergeSortBenchmark() {
+    void MultiThreadedBenchmark::parallelMergeSortBenchmark() {
         if (numThreads == 0) {
             return;
         }
@@ -194,12 +148,7 @@ private:
         parallelMergeSort(arr, 0, ARRAY_SIZE - 1, maxDepth);
     }
 
-    //Image processing
-
-    using Image = std::vector<std::vector<float>>;
-    using Kernel = std::vector<std::vector<float>>;
-
-    static void applyKernel(const Image& input, Image& output, const Kernel& kernel, int startRow, int endRow){
+    void MultiThreadedBenchmark::applyKernel(const Image &input, Image &output, const Kernel &kernel, int startRow, int endRow) {
         int kernelSize = static_cast<int>(kernel.size());
         int offset = kernelSize / 2;
         int numRows = static_cast<int>(input.size());
@@ -222,7 +171,7 @@ private:
         }
     }
 
-    static void imageProcessingBenchmark(){
+    void MultiThreadedBenchmark::imageProcessingBenchmark() {
         if(numThreads == 0){
             return;
         }
@@ -257,26 +206,4 @@ private:
             t.join();
         }
     }
-};
-
-volatile float MultiThreadedBenchmarks::progress = 0.0f;
-unsigned int MultiThreadedBenchmarks::numThreads = 0;
-
-
-extern "C" JNIEXPORT float JNICALL
-Java_app_benchmarkapp_MainActivity_00024Companion_getMultiThreadedProgress(JNIEnv* env, jobject /* this */, jint numThreads) {
-    MultiThreadedBenchmarks::numThreads = static_cast<unsigned int>(numThreads);
-    return MultiThreadedBenchmarks::progress;
 }
-
-
-// Function to perform a CPU benchmark
-extern "C" JNIEXPORT jlong JNICALL
-Java_app_benchmarkapp_MainActivity_00024Companion_multiThreadedBenchmark(JNIEnv* env, jobject /* this */, jint numThreads) {
-    MultiThreadedBenchmarks::numThreads = static_cast<unsigned int>(numThreads);
-
-    long long score = MultiThreadedBenchmarks::runBenchmarks(MultiThreadedBenchmarks::getFunctions(), 3);
-
-    return static_cast<jlong>(score);
-}
-

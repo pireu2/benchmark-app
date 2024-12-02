@@ -4,11 +4,15 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project("benchmarkapp")
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        cpu_single_threaded_benchmark.cpp
-        cpu_multi_threaded_benchmark.cpp
-        ram_benchmark.cpp
+        benchmarks.cpp
+        BenchmarkBase.cpp
+        SingleThreadedBenchmark.cpp
+        MultiThreadedBenchmark.cpp
+        RamBenchmark.cpp
+        StorageBenchmark.cpp
         )
 
 
