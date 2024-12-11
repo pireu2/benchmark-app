@@ -48,6 +48,8 @@ class MainActivity : ComponentActivity() {
 
         external fun storageBenchmark(): Long
         external fun getStorageProgress(): Float
+
+        external fun setCacheDirPath(path: String)
     }
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +59,10 @@ class MainActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             Renderer.getResources(this@MainActivity)
         }
+
+        DeviceStats.cacheDirPath = this.cacheDir.absolutePath
+        setCacheDirPath(this.cacheDir.absolutePath)
+
 
         setContent {
             BenchmarkAppTheme {

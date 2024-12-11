@@ -8,11 +8,10 @@ namespace benchmark {
     public:
         BenchmarkFunctions getFunctions() override;
     private:
-        static const unsigned int SIZE = 1024 * 1024 * 50;
+        static const unsigned int SIZE = 1024 * 1024 * 10; // 10MB
 
-        static void memoryAllocationTest();
-        static void memoryAccessSpeedTest();
-        static void memoryBandwidthTest();
+        static void memoryAccessSpeedTest(int scalingFactor);
+        static void memoryBandwidthTest(int scalingFactor);
     };
 
 }

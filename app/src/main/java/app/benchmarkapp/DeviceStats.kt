@@ -12,4 +12,6 @@ object DeviceStats {
     var ramScore: Long? = null
     var storageScore: Long? = null
     var gpuScore: Long? = null
+
+    var cacheDirPath: String? = null
 }

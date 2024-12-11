@@ -4,43 +4,46 @@ namespace benchmark {
 
     BenchmarkFunctions SingleThreadedBenchmark::getFunctions() {
         static BenchmarkFunction functions[] = { calculatePrimes, calculatePiDigits, sort };
-        return {functions, 3};
+        static std::vector<std::string> names = { "Calculate Primes", "Calculate Pi Digits", "Sort" };
+        return {functions, names, 3};
     }
 
-    void SingleThreadedBenchmark::calculatePrimes() {
-        std::vector<int> primes;
+    void SingleThreadedBenchmark::calculatePrimes(int scalingFactor) {
+        unsigned int size = PRIME_LIMIT * scalingFactor;
 
-        for(int i = 0; i < PRIME_LIMIT; i++){
-            if(isPrime(i)){
-                primes.push_back(i);
-            }
+        for(int i = 0; i < size; i++){
+            isPrime(i);
         }
     }
 
-    void SingleThreadedBenchmark::calculatePiDigits() {
+    void SingleThreadedBenchmark::calculatePiDigits(int scalingFactor) {
+        unsigned int size = PI_DIGITS * scalingFactor;
+
         std::vector<unsigned int> piDigits;
-        piDigits.reserve(PI_DIGITS);
-        for (int i = 0; i < PI_DIGITS; ++i) {
+        piDigits.reserve(size);
+        for (int i = 0; i < size; ++i) {
             piDigits.push_back(piDigit(i));
         }
     }
 
-    void SingleThreadedBenchmark::sort() {
+    void SingleThreadedBenchmark::sort(int scalingFactor) {
+        unsigned int size = SORT_SIZE * scalingFactor;
+
         std::vector<int> v;
-        v.reserve(SORT_SIZE);
+        v.reserve(size);
 
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, SORT_SIZE);
+        std::uniform_int_distribution<> dis(0, size);
 
-        for (int i = 0; i < SORT_SIZE; i++) {
+        for (int i = 0; i < size; i++) {
             v.push_back(dis(gen));
         }
 
         bool swapped;
-        for (int i = 0; i < SORT_SIZE - 1; i++) {
+        for (int i = 0; i < size - 1; i++) {
             swapped = false;
-            for (int j = SORT_SIZE - 1; j > i; j--) {
+            for (int j = size - 1; j > i; j--) {
                 if (v[j] < v[j - 1]) {
                     std::swap(v[j], v[j - 1]);
                     swapped = true;
@@ -53,12 +56,14 @@ namespace benchmark {
     }
 
     bool SingleThreadedBenchmark::isPrime(int n) {
-        if (n <= 1) return false;
-        if (n <= 3) return true;
-        if (n % 2 == 0 || n % 3 == 0) return false;
+        if (n <= 1) {
+            return false;
+        }
 
-        for (int i = 5; i * i <= n; i += 6) {
-            if (n % i == 0 || n % (i + 2) == 0) return false;
+        for (int i = 2; i <= n / 2; i++) {
+            if (n % i == 0) {
+                return false;
+            }
         }
 
         return true;

@@ -3,7 +3,6 @@ package app.benchmarkapp.ui.components.benchmark
 import CircularProgress
 import android.annotation.SuppressLint
 import android.opengl.GLSurfaceView
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -135,7 +134,6 @@ fun GpuBenchmarkWidget(modifier: Modifier = Modifier) {
                                     delay(200)
                                     score = (Renderer.frameCounts.average() * 4 * 100).toInt()
                                     DeviceStats.gpuScore = score.toLong()
-                                    Log.d("GPU Benchmark", "Score: $score")
                                     progress = 100f
                                     isRunning = false
                                     DeviceStats.disableNavigation = false

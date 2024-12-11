@@ -11,6 +11,7 @@ namespace benchmark{
     MultiThreadedBenchmark multiThreadedBenchmark;
     RamBenchmark ramBenchmark;
     StorageBenchmark storageBenchmark;
+    std::string cacheDirPath;
 
     extern "C" JNIEXPORT float JNICALL
     Java_app_benchmarkapp_MainActivity_00024Companion_getSingleThreadedProgress(JNIEnv* env, jobject /* this */) {
@@ -20,7 +21,7 @@ namespace benchmark{
 
     extern "C" JNIEXPORT jlong JNICALL
     Java_app_benchmarkapp_MainActivity_00024Companion_singleThreadedBenchmark(JNIEnv* env, jobject /* this */) {
-        long long score = singleThreadedBenchmark.runBenchmarks();
+        long long score = singleThreadedBenchmark.runBenchmarks(cacheDirPath);
 
         return static_cast<jlong>(score);
     }
@@ -35,7 +36,7 @@ namespace benchmark{
     Java_app_benchmarkapp_MainActivity_00024Companion_multiThreadedBenchmark(JNIEnv* env, jobject /* this */, jint numThreads) {
         MultiThreadedBenchmark::numThreads = static_cast<unsigned int>(numThreads);
 
-        long long score = multiThreadedBenchmark.runBenchmarks();
+        long long score = multiThreadedBenchmark.runBenchmarks(cacheDirPath);
 
         return static_cast<jlong>(score);
     }
@@ -43,7 +44,7 @@ namespace benchmark{
     extern "C"
     JNIEXPORT jlong JNICALL
     Java_app_benchmarkapp_MainActivity_00024Companion_ramBenchmark(JNIEnv *env, jobject thiz) {
-        long long score = ramBenchmark.runBenchmarks();
+        long long score = ramBenchmark.runBenchmarks(cacheDirPath);
 
         return static_cast<jlong>(score);
     }
@@ -56,7 +57,7 @@ namespace benchmark{
 
     extern "C" JNIEXPORT jlong JNICALL
     Java_app_benchmarkapp_MainActivity_00024Companion_storageBenchmark(JNIEnv *env, jobject thiz) {
-        long long score = storageBenchmark.runBenchmarks();
+        long long score = storageBenchmark.runBenchmarks(cacheDirPath);
         return static_cast<jlong>(score);
     }
 
@@ -65,5 +66,14 @@ namespace benchmark{
         return storageBenchmark.getProgress();
     }
 
+    extern "C"
+    JNIEXPORT void JNICALL
+    Java_app_benchmarkapp_MainActivity_00024Companion_setCacheDirPath(JNIEnv *env, jobject thiz, jstring path) {
+        const char *nativePath = env->GetStringUTFChars(path, nullptr);
+        cacheDirPath = std::string(nativePath);
+        env->ReleaseStringUTFChars(path, nativePath);
+    }
+
 }
+
 

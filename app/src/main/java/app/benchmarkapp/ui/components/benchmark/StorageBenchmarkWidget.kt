@@ -3,6 +3,7 @@ package app.benchmarkapp.ui.components.benchmark
 
 import CircularProgress
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,7 @@ import app.benchmarkapp.ui.components.MemoryInfoWidget
 import app.benchmarkapp.ui.theme.Purple40
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.concurrent.Executors
 import kotlin.math.floor
 
@@ -93,6 +95,17 @@ fun StorageBenckmarkWidget() {
                                     DeviceStats.storageScore = score
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
+
+                                    val resultsFile = File((DeviceStats.cacheDirPath!! + "results.txt"))
+                                    if(resultsFile.exists()) {
+                                        val results = resultsFile.readLines()
+                                        for (result in results) {
+                                            Log.d("Benchmark", result)
+                                        }
+                                    }
+                                    else{
+                                        Log.d("Benchmark", "File does not exist")
+                                    }
                                 }
                             }
                         ) {

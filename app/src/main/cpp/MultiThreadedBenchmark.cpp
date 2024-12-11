@@ -5,9 +5,93 @@ namespace benchmark {
 
     BenchmarkFunctions MultiThreadedBenchmark::getFunctions() {
         static BenchmarkFunction functions[] = { matrixMultiplicationBenchmark, parallelMergeSortBenchmark, imageProcessingBenchmark };
-        return {functions, 3};
+        static std::vector<std::string> names = { "Matrix Multiplication", "Parallel Merge Sort", "Image Processing" };
+        return {functions, names, 3};
     }
 
+
+    void MultiThreadedBenchmark::matrixMultiplicationBenchmark(int scalingFactor) {
+        if(numThreads == 0){
+            return;
+        }
+
+        int size = MATRIX_SIZE * scalingFactor;
+
+        Matrix A(size, std::vector<int>(size));
+        Matrix B(size, std::vector<int>(size));
+        Matrix C(size, std::vector<int>(size));
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(1, 100);
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                A[i][j] = dis(gen);
+                B[i][j] = dis(gen);
+            }
+        }
+
+        matrixMultiply(A, B, C);
+    }
+
+    void MultiThreadedBenchmark::parallelMergeSortBenchmark(int scalingFactor) {
+        if (numThreads == 0) {
+            return;
+        }
+
+        int size = ARRAY_SIZE * scalingFactor;
+
+        std::vector<int> arr(size);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dis(1, 100);
+
+        for (int i = 0; i < size; i++) {
+            arr[i] = dis(gen);
+        }
+
+        int maxDepth = std::ceil(std::log2(numThreads));
+        parallelMergeSort(arr, 0, size - 1, maxDepth);
+    }
+
+    void MultiThreadedBenchmark::imageProcessingBenchmark(int scalingFactor) {
+        if(numThreads == 0){
+            return;
+        }
+
+        int size = IMAGE_SIZE * scalingFactor;
+
+        Image input(size, std::vector<float>(size));
+        Image output(size, std::vector<float>(size));
+        Kernel kernel = {
+                {0.0625, 0.125, 0.0625},
+                {0.125, 0.25, 0.125},
+                {0.0625, 0.125, 0.0625}
+        };
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                input[i][j] = dis(gen);
+            }
+        }
+
+        std::vector<std::thread> threads;
+        int rowsPerThread = size / numThreads;
+        for (unsigned int i = 0; i < numThreads; ++i) {
+            int startRow = i * rowsPerThread;
+            int endRow = (i == numThreads - 1) ? size : startRow + rowsPerThread;
+            threads.emplace_back(applyKernel, std::cref(input), std::ref(output), std::cref(kernel), startRow, endRow);
+        }
+
+        for (auto& t : threads) {
+            t.join();
+        }
+    }
 
     void MultiThreadedBenchmark::multiplyRowByMatrix(const Matrix &A, const Matrix &B, Matrix &C, int row) {
         unsigned int n = B.size();
@@ -41,28 +125,6 @@ namespace benchmark {
         for(auto& t : threads){
             t.join();
         }
-    }
-
-    void MultiThreadedBenchmark::matrixMultiplicationBenchmark() {
-        if(numThreads == 0){
-            return;
-        }
-        Matrix A(MATRIX_SIZE, std::vector<int>(MATRIX_SIZE));
-        Matrix B(MATRIX_SIZE, std::vector<int>(MATRIX_SIZE));
-        Matrix C(MATRIX_SIZE, std::vector<int>(MATRIX_SIZE));
-
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> dis(1, 100);
-
-        for (int i = 0; i < MATRIX_SIZE; i++) {
-            for (int j = 0; j < MATRIX_SIZE; j++) {
-                A[i][j] = dis(gen);
-                B[i][j] = dis(gen);
-            }
-        }
-
-        matrixMultiply(A, B, C);
     }
 
     void MultiThreadedBenchmark::merge(std::vector<int> &arr, int left, int mid, int right) {
@@ -131,22 +193,7 @@ namespace benchmark {
         }
     }
 
-    void MultiThreadedBenchmark::parallelMergeSortBenchmark() {
-        if (numThreads == 0) {
-            return;
-        }
-        std::vector<int> arr(ARRAY_SIZE);
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> dis(1, 100);
 
-        for (int i = 0; i < ARRAY_SIZE; i++) {
-            arr[i] = dis(gen);
-        }
-
-        int maxDepth = std::ceil(std::log2(numThreads));
-        parallelMergeSort(arr, 0, ARRAY_SIZE - 1, maxDepth);
-    }
 
     void MultiThreadedBenchmark::applyKernel(const Image &input, Image &output, const Kernel &kernel, int startRow, int endRow) {
         int kernelSize = static_cast<int>(kernel.size());
@@ -168,42 +215,6 @@ namespace benchmark {
                 }
                 output[i][j] = sum;
             }
-        }
-    }
-
-    void MultiThreadedBenchmark::imageProcessingBenchmark() {
-        if(numThreads == 0){
-            return;
-        }
-
-        Image input(IMAGE_SIZE, std::vector<float>(IMAGE_SIZE));
-        Image output(IMAGE_SIZE, std::vector<float>(IMAGE_SIZE));
-        Kernel kernel = {
-                {0.0625, 0.125, 0.0625},
-                {0.125, 0.25, 0.125},
-                {0.0625, 0.125, 0.0625}
-        };
-
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_real_distribution<float> dis(0.0f, 1.0f);
-
-        for (int i = 0; i < IMAGE_SIZE; i++) {
-            for (int j = 0; j < IMAGE_SIZE; j++) {
-                input[i][j] = dis(gen);
-            }
-        }
-
-        std::vector<std::thread> threads;
-        int rowsPerThread = IMAGE_SIZE / numThreads;
-        for (unsigned int i = 0; i < numThreads; ++i) {
-            int startRow = i * rowsPerThread;
-            int endRow = (i == numThreads - 1) ? IMAGE_SIZE : startRow + rowsPerThread;
-            threads.emplace_back(applyKernel, std::cref(input), std::ref(output), std::cref(kernel), startRow, endRow);
-        }
-
-        for (auto& t : threads) {
-            t.join();
         }
     }
 }

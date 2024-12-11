@@ -12,11 +12,10 @@ namespace benchmark{
     public:
         BenchmarkFunctions getFunctions() override;
     private:
-        static const unsigned int FILE_SIZE = 1024 * 1024 * 50; // 50 MB
+        static const unsigned int FILE_SIZE = 1024 * 1024 * 10; // 50 MB
 
-        static void fileWriteTest();
-        static void fileReadTest();
-        static void fileDeleteTest();
+        static void fileWriteTest(int scalingFactor);
+        static void fileReadTest(int scalingFactor);
     };
 }
 

@@ -2,28 +2,18 @@
 
 namespace benchmark {
     BenchmarkFunctions RamBenchmark::getFunctions() {
-        static BenchmarkFunction functions[] = { memoryAllocationTest, memoryAccessSpeedTest, memoryBandwidthTest };
-        return {functions, 3};
+        static BenchmarkFunction functions[] = { memoryAccessSpeedTest, memoryBandwidthTest };
+        static std::vector<std::string> names = { "Memory Access Speed", "Memory Bandwidth" };
+
+        return {functions, names, 2};
     }
 
-    void RamBenchmark::memoryAllocationTest() {
-        const int numAllocations = 10;
-        std::vector<void*> allocations;
 
-        for (int i = 0; i < numAllocations; ++i) {
-            void* block = malloc(SIZE);
-            if (block) {
-                allocations.push_back(block);
-            }
-        }
+    void RamBenchmark::memoryAccessSpeedTest(int scalingFactor) {
+        unsigned int size = SIZE * scalingFactor;
 
-        for (void* block : allocations) {
-            free(block);
-        }
-    }
+        std::vector<int> memory(size / sizeof(int), 0);
 
-    void RamBenchmark::memoryAccessSpeedTest() {
-        std::vector<int> memory(SIZE / sizeof(int), 0);
 
         for (size_t i = 0; i < memory.size(); ++i) {
             memory[i] = static_cast<int>(i);
@@ -35,10 +25,11 @@ namespace benchmark {
         }
     }
 
-    void RamBenchmark::memoryBandwidthTest() {
-        std::vector<char> src(SIZE, 'a');
-        std::vector<char> dst(SIZE);
+    void RamBenchmark::memoryBandwidthTest(int scalingFactor) {
+        unsigned int size = SIZE * scalingFactor;
+        std::vector<char> src(size, 'a');
+        std::vector<char> dst(size);
 
-        std::memcpy(dst.data(), src.data(), SIZE);
+        std::memcpy(dst.data(), src.data(), size);
     }
 }
