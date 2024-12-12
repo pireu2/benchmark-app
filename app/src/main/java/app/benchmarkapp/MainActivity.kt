@@ -17,15 +17,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.benchmarkapp.graphics.Renderer
-import app.benchmarkapp.ui.components.benchmark.CpuBenchmarkWidget
-import app.benchmarkapp.ui.components.benchmark.GpuBenchmarkWidget
-import app.benchmarkapp.ui.components.HomeWidget
-import app.benchmarkapp.ui.components.benchmark.RamBenchmarkWidget
+import app.benchmarkapp.ui.components.pages.CpuBenchmarkWidget
+import app.benchmarkapp.ui.components.pages.GpuBenchmarkWidget
+import app.benchmarkapp.ui.components.pages.HomeWidget
+import app.benchmarkapp.ui.components.pages.RamBenchmarkWidget
 import app.benchmarkapp.ui.components.SideMenu
 import app.benchmarkapp.ui.components.SpecsWidget
 import app.benchmarkapp.ui.theme.BenchmarkAppTheme
 import app.benchmarkapp.ui.components.TitleBar
-import app.benchmarkapp.ui.components.benchmark.StorageBenckmarkWidget
+import app.benchmarkapp.ui.components.pages.StorageBenckmarkWidget
+import com.github.mikephil.charting.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +55,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Utils.init(this)
         enableEdgeToEdge()
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -88,10 +90,10 @@ class MainActivity : ComponentActivity() {
                             NavHost(navController = navController, startDestination = "home") {
                                 composable("home") { HomeWidget(context = this@MainActivity) }
                                 composable("device_info") { SpecsWidget() }
-                                composable("cpu_benchmark") { CpuBenchmarkWidget() }
+                                composable("cpu_benchmark") { CpuBenchmarkWidget(context = this@MainActivity) }
                                 composable("gpu_benchmark") { GpuBenchmarkWidget() }
-                                composable("ram_benchmark") { RamBenchmarkWidget() }
-                                composable("storage_benchmark") { StorageBenckmarkWidget() }
+                                composable("ram_benchmark") { RamBenchmarkWidget(context = this@MainActivity) }
+                                composable("storage_benchmark") { StorageBenckmarkWidget(context = this@MainActivity) }
                             }
                         }
                     }

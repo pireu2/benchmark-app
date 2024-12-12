@@ -1,9 +1,10 @@
-package app.benchmarkapp.ui.components.benchmark
+package app.benchmarkapp.ui.components.pages
 
 
 import CircularProgress
+import GraphDialog
 import android.annotation.SuppressLint
-import android.util.Log
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,28 +34,28 @@ import app.benchmarkapp.ui.components.MemoryInfoWidget
 import app.benchmarkapp.ui.theme.Purple40
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.concurrent.Executors
 import kotlin.math.floor
 
 @SuppressLint("NewApi")
 @Composable
-fun RamBenchmarkWidget() {
+fun StorageBenckmarkWidget(context: Context) {
 
     val threadDispatcher = Executors.newSingleThreadExecutor {
-        runnable -> Thread(runnable).apply {
-            priority = Thread.MAX_PRIORITY
-        }
+            runnable -> Thread(runnable).apply {
+        priority = Thread.MAX_PRIORITY
+    }
     }
 
     var isRunning by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var score by remember { mutableStateOf<Long?>(null) }
     var progress by remember { mutableFloatStateOf(0f) }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         while (true) {
-            progress = MainActivity.getRamProgress()
+            progress = MainActivity.getStorageProgress()
             kotlinx.coroutines.delay(100)
         }
     }
@@ -70,7 +71,7 @@ fun RamBenchmarkWidget() {
             ) {
                 Column(modifier = Modifier.padding(8.dp)) {
                     Text(
-                        text = "RAM Benchmark",
+                        text = "Storage Benchmark",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -79,7 +80,7 @@ fun RamBenchmarkWidget() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "This benchmark will perform a benchmark of the random access memory of the device.",
+                            text = "This benchmark will perform a benchmark of the storage of the device.",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -91,21 +92,10 @@ fun RamBenchmarkWidget() {
                                 isRunning = true
                                 DeviceStats.disableNavigation = true
                                 scope.launch(threadDispatcher.asCoroutineDispatcher()) {
-                                    score = MainActivity.ramBenchmark()
-                                    DeviceStats.ramScore = score
+                                    score = MainActivity.storageBenchmark()
+                                    DeviceStats.storageScore = score
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
-
-                                    val resultsFile = File((DeviceStats.cacheDirPath!! + "results.txt"))
-                                    if(resultsFile.exists()) {
-                                        val results = resultsFile.readLines()
-                                        for (result in results) {
-                                            Log.d("Benchmark", result)
-                                        }
-                                    }
-                                    else{
-                                        Log.d("Benchmark", "File does not exist")
-                                    }
                                 }
                             }
                         ) {
@@ -119,13 +109,25 @@ fun RamBenchmarkWidget() {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Score: ${score ?: (DeviceStats.ramScore ?: "N/A")}",
+                            text = "Score: ${score ?: (DeviceStats.storageScore ?: "N/A")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                            onClick = { showDialog = true },
+                            enabled = score != null
+                        ) {
+                            Text(text = "View Graphs")
+                        }
                     }
                 }
             }
         }
 
+    }
+
+    if (showDialog) {
+        GraphDialog(context = context, onDismiss = { showDialog = false })
     }
 }

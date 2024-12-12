@@ -1,4 +1,4 @@
-package app.benchmarkapp.ui.components
+package app.benchmarkapp.ui.components.pages
 
 import android.annotation.SuppressLint
 import android.content.Context

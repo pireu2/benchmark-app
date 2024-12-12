@@ -1,8 +1,10 @@
-package app.benchmarkapp.ui.components.benchmark
+package app.benchmarkapp.ui.components.pages
 
 
 import CircularProgress
+import GraphDialog
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,7 +40,7 @@ import kotlin.math.floor
 
 @SuppressLint("NewApi")
 @Composable
-fun CpuBenchmarkWidget() {
+fun CpuBenchmarkWidget(context: Context) {
 
     val singleThreadedDispatcher = Executors.newSingleThreadExecutor {
             runnable -> Thread(runnable).apply {
@@ -55,6 +58,10 @@ fun CpuBenchmarkWidget() {
 
     var singleThreadedScore by remember { mutableStateOf<Long?>(null) }
     var multiThreadedScore by remember { mutableStateOf<Long?>(null) }
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    var lastBenchmark by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -92,6 +99,7 @@ fun CpuBenchmarkWidget() {
                             colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                             enabled = !isRunning,
                             onClick = {
+                                lastBenchmark = 1
                                 if (isRunning) return@Button
                                 isRunning = true
                                 DeviceStats.disableNavigation = true
@@ -116,6 +124,14 @@ fun CpuBenchmarkWidget() {
                             text = "Score: ${singleThreadedScore ?: (DeviceStats.singleThreadedScore ?: "N/A")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                            onClick = { showDialog = true },
+                            enabled = singleThreadedScore != null && lastBenchmark == 1
+                        ) {
+                            Text(text = "View Graphs")
+                        }
                     }
                 }
             }
@@ -146,6 +162,7 @@ fun CpuBenchmarkWidget() {
                                 colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                                 enabled = !isRunning,
                                 onClick = {
+                                    lastBenchmark = 2
                                     if (isRunning) return@Button
                                     isRunning = true
                                     DeviceStats.disableNavigation = true
@@ -170,10 +187,22 @@ fun CpuBenchmarkWidget() {
                                 text = "Score: ${multiThreadedScore ?: (DeviceStats.multiThreadedScore ?: "N/A")}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                                onClick = { showDialog = true },
+                                enabled = multiThreadedScore != null && lastBenchmark == 2
+                            ) {
+                                Text(text = "View Graphs")
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        GraphDialog(context = context, onDismiss = { showDialog = false })
     }
 }
