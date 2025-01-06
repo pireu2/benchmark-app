@@ -27,12 +27,16 @@ import app.benchmarkapp.ui.theme.BenchmarkAppTheme
 import app.benchmarkapp.ui.components.TitleBar
 import app.benchmarkapp.ui.components.pages.StorageBenckmarkWidget
 import com.github.mikephil.charting.utils.Utils
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+
     companion object
     {
         init{
@@ -55,9 +59,14 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
+        auth = FirebaseAuth.getInstance()
+        auth.signInAnonymously()
         DeviceStats.init(this)
         Utils.init(this)
         enableEdgeToEdge()
+
+
 
         CoroutineScope(Dispatchers.IO).launch {
             Renderer.getResources(this@MainActivity)
