@@ -95,7 +95,7 @@ fun RamBenchmarkWidget(context: Context) {
                                 DeviceStats.disableNavigation = true
                                 scope.launch(threadDispatcher.asCoroutineDispatcher()) {
                                     score = MainActivity.ramBenchmark()
-                                    DeviceStats.ramScore = score
+                                    DeviceStats.setRamScore(score!!)
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
 
@@ -122,7 +122,7 @@ fun RamBenchmarkWidget(context: Context) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Score: ${score ?: (DeviceStats.ramScore ?: "N/A")}",
+                            text = "Score: ${score ?: (DeviceStats.getRamScore() ?: "N/A")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))

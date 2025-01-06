@@ -132,8 +132,8 @@ fun GpuBenchmarkWidget(modifier: Modifier = Modifier) {
                                         delay(100)
                                     }
                                     delay(200)
-                                    score = (Renderer.frameCounts.average() * 4 * 100).toInt()
-                                    DeviceStats.gpuScore = score.toLong()
+                                    score = (Renderer.frameCounts.average() * 4 * 10).toInt()
+                                    DeviceStats.setGpuScore(score.toLong())
                                     progress = 100f
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
@@ -150,7 +150,7 @@ fun GpuBenchmarkWidget(modifier: Modifier = Modifier) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Score: ${DeviceStats.gpuScore ?: if (score == 0) "N/A" else score}",
+                            text = "Score: ${DeviceStats.getGpuScore() ?: if (score == 0) "N/A" else score}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

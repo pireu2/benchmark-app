@@ -1,4 +1,4 @@
-package app.benchmarkapp.ui.components
+package app.benchmarkapp.ui.components.pages
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.benchmarkapp.DeviceStats
+import app.benchmarkapp.ui.components.BatteryInfoWidget
+import app.benchmarkapp.ui.components.CpuInfoWidget
+import app.benchmarkapp.ui.components.DeviceInfoWidget
+import app.benchmarkapp.ui.components.GpuInfoWidget
+import app.benchmarkapp.ui.components.MemoryInfoWidget
 import app.benchmarkapp.ui.theme.backgroundColor
 
 @SuppressLint("NewApi")
@@ -24,11 +29,11 @@ fun SpecsWidget(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth()
     ) {
         LazyColumn(modifier = modifier.padding(8.dp)) {
-            item {DeviceInfoWidget(info = specs)}
-            item {CpuInfoWidget(info = specs.cpu)}
-            specs.gpu?.let { item {GpuInfoWidget(info = it)} }
-            item {MemoryInfoWidget(info = specs.memory)}
-            item {BatteryInfoWidget(info = specs.battery)}
+            item { DeviceInfoWidget(info = specs) }
+            item { CpuInfoWidget(info = specs.cpu) }
+            specs.gpu?.let { item { GpuInfoWidget(info = it) } }
+            item { MemoryInfoWidget(info = specs.memory) }
+            item { BatteryInfoWidget(info = specs.battery) }
         }
     }
 }

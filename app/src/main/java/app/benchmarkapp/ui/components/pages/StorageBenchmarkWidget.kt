@@ -93,7 +93,7 @@ fun StorageBenckmarkWidget(context: Context) {
                                 DeviceStats.disableNavigation = true
                                 scope.launch(threadDispatcher.asCoroutineDispatcher()) {
                                     score = MainActivity.storageBenchmark()
-                                    DeviceStats.storageScore = score
+                                    DeviceStats.setStorageScore(score!!)
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
                                 }
@@ -109,7 +109,7 @@ fun StorageBenckmarkWidget(context: Context) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Score: ${score ?: (DeviceStats.storageScore ?: "N/A")}",
+                            text = "Score: ${score ?: (DeviceStats.getStorageScore() ?: "N/A")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))

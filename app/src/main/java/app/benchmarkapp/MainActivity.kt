@@ -22,7 +22,7 @@ import app.benchmarkapp.ui.components.pages.GpuBenchmarkWidget
 import app.benchmarkapp.ui.components.pages.HomeWidget
 import app.benchmarkapp.ui.components.pages.RamBenchmarkWidget
 import app.benchmarkapp.ui.components.SideMenu
-import app.benchmarkapp.ui.components.SpecsWidget
+import app.benchmarkapp.ui.components.pages.SpecsWidget
 import app.benchmarkapp.ui.theme.BenchmarkAppTheme
 import app.benchmarkapp.ui.components.TitleBar
 import app.benchmarkapp.ui.components.pages.StorageBenckmarkWidget
@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DeviceStats.init(this)
         Utils.init(this)
         enableEdgeToEdge()
 

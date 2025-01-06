@@ -105,7 +105,7 @@ fun CpuBenchmarkWidget(context: Context) {
                                 DeviceStats.disableNavigation = true
                                 scope.launch(singleThreadedDispatcher.asCoroutineDispatcher()) {
                                     singleThreadedScore = MainActivity.singleThreadedBenchmark()
-                                    DeviceStats.singleThreadedScore = singleThreadedScore
+                                    DeviceStats.setSingleThreadedScore(singleThreadedScore!!)
                                     isRunning = false
                                     DeviceStats.disableNavigation = false
                                 }
@@ -121,7 +121,7 @@ fun CpuBenchmarkWidget(context: Context) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Score: ${singleThreadedScore ?: (DeviceStats.singleThreadedScore ?: "N/A")}",
+                            text = "Score: ${singleThreadedScore ?: (DeviceStats.getSingleThreadedScore() ?: "N/A")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -168,7 +168,7 @@ fun CpuBenchmarkWidget(context: Context) {
                                     DeviceStats.disableNavigation = true
                                     scope.launch(it.asCoroutineDispatcher()) {
                                         multiThreadedScore = MainActivity.multiThreadedBenchmark(cores)
-                                        DeviceStats.multiThreadedScore = multiThreadedScore
+                                        DeviceStats.setMultiThreadedScore(multiThreadedScore!!)
                                         isRunning = false
                                         DeviceStats.disableNavigation = false
                                     }
@@ -184,7 +184,7 @@ fun CpuBenchmarkWidget(context: Context) {
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Score: ${multiThreadedScore ?: (DeviceStats.multiThreadedScore ?: "N/A")}",
+                                text = "Score: ${multiThreadedScore ?: (DeviceStats.getMultiThreadedScore() ?: "N/A")}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(modifier = Modifier.height(8.dp))
