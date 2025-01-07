@@ -61,7 +61,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         auth = FirebaseAuth.getInstance()
-        auth.signInAnonymously()
+        auth.signInAnonymously().addOnCompleteListener(this){
+            if(it.isSuccessful){
+                DeviceStats.isLoggedIn = true
+            }
+        }
         DeviceStats.init(this)
         Utils.init(this)
         enableEdgeToEdge()

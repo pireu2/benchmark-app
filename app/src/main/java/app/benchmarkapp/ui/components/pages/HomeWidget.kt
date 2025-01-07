@@ -70,21 +70,47 @@ fun HomeWidget(context: Context, modifier: Modifier = Modifier) {
                             .fillMaxWidth()
                     )
                     {
-                        Text(text = "Last Benchmark Results", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Last Benchmark Results",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.padding(4.dp))
-                        Text(text = "Total Score: ${DeviceStats.getTotalScore() ?: "N/A"}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Total Score: ${DeviceStats.getTotalScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
                         Spacer(modifier = Modifier.padding(4.dp))
-                        Text(text = "Single Threaded Score: ${DeviceStats.getSingleThreadedScore() ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Multi Threaded Score: ${DeviceStats.getMultiThreadedScore() ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "GPU Score: ${DeviceStats.getGpuScore() ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "RAM Score: ${DeviceStats.getRamScore() ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Storage Score: ${DeviceStats.getStorageScore() ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = "Single Threaded Score: ${DeviceStats.getSingleThreadedScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Multi Threaded Score: ${DeviceStats.getMultiThreadedScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "GPU Score: ${DeviceStats.getGpuScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "RAM Score: ${DeviceStats.getRamScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Storage Score: ${DeviceStats.getStorageScore() ?: "N/A"}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                         Spacer(modifier = Modifier.padding(8.dp))
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Button(
                                 colors = ButtonDefaults.buttonColors(containerColor = Purple40),
                                 onClick = { FirebaseHelper.submitCurrentScore() },
-                                enabled = allScoresAvailable,
+                                enabled = allScoresAvailable && DeviceStats.isLoggedIn,
                             ) {
                                 Text(text = "Submit Scores")
                             }
@@ -92,37 +118,88 @@ fun HomeWidget(context: Context, modifier: Modifier = Modifier) {
                     }
                 }
             }
-            item{
-                Card(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                )
-                {
-                    Column(
+            if (DeviceStats.isLoggedIn) {
+                item {
+                    Card(
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth()
                     )
                     {
-                        Text(text = "Online Submitted Scores", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        )
+                        {
+                            Text(
+                                text = "Online Submitted Scores",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
-            }
-            items(scores){score ->
-                Card(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(text = "Device: ${score.device}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                        Text(text = "Total Score: ${score.totalScore}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                        Text(text = "Single Threaded Score: ${score.singleThreadedScore}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Multi Threaded Score: ${score.multiThreadedScore}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "GPU Score: ${score.gpuScore}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "RAM Score: ${score.ramScore}", style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Storage Score: ${score.storageScore}", style = MaterialTheme.typography.bodyMedium)
+                items(scores) { score ->
+                    Card(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Text(
+                                text = "Device: ${score.device}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Total Score: ${score.totalScore}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Single Threaded Score: ${score.singleThreadedScore}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Multi Threaded Score: ${score.multiThreadedScore}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "GPU Score: ${score.gpuScore}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "RAM Score: ${score.ramScore}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Storage Score: ${score.storageScore}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            } else {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    )
+                    {
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        )
+                        {
+                            Text(
+                                text = "Could not connect to the server",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }

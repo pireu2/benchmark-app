@@ -10,6 +10,7 @@ object DeviceStats {
     var deviceInfo: DeviceInfoProvider.DeviceInfo ? = null
     var disableNavigation by  mutableStateOf(false)
     var cacheDirPath: String? = null
+    var isLoggedIn by mutableStateOf(false)
 
     private var singleThreadedScore: Long? = null
     private var multiThreadedScore: Long? = null

@@ -1,6 +1,6 @@
-# BenchmarkApp
+# BenchCraft
 
-BenchmarkApp is an Android application designed to benchmark various aspects of your device. This project is built using Kotlin and Gradle.
+BenchCraft is an Android application designed to benchmark various aspects of your device. This project is built using Kotlin and Gradle.
 
 ## Context
 

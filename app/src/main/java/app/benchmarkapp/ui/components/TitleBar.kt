@@ -22,7 +22,7 @@ fun TitleBar(drawerState: DrawerState) {
     val scope = rememberCoroutineScope()
 
     TopAppBar(
-        title = { Text(text = "Benchmark App", fontWeight = FontWeight.Bold) },
+        title = { Text(text = "BenchCraft", fontWeight = FontWeight.Bold) },
         navigationIcon = {
             IconButton(onClick = {
                 scope.launch {
